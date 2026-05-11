@@ -1,0 +1,33 @@
+[project]
+name = "aoaoanalyzer"
+version = "0.1.0"
+description = "Ao Ao Analyzer is a local, Dockerized, AI-assisted equity and options research operating system."
+requires-python = ">=3.11"
+readme = "README.md"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+python_classes = ["Test*"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+
+[tool.coverage.run]
+source = ["app"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
