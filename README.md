@@ -98,12 +98,16 @@ aoaoanalyzer
     ├── models
     ├── exports
     ├── docs
+    ├── docker-compose.yml
+    ├── Dockerfile.api
+    ├── Dockerfile.agent
+    ├── Dockerfile.dashboard
     ├── .env.example
     ├── requirements.txt
     ├── pyproject.toml
     └── README.md
 
-## Local Setup
+## Local Python Setup
 
 Create a virtual environment:
 
@@ -137,6 +141,40 @@ Open the dashboard:
 
     http://localhost:8501
 
+## Docker Setup
+
+Build and start the local platform:
+
+    docker compose up --build
+
+Open the FastAPI health endpoint:
+
+    http://localhost:8000/health
+
+Open the dashboard:
+
+    http://localhost:8501
+
+PostgreSQL is available on the host at:
+
+    localhost:5434
+
+Redis is available on the host at:
+
+    localhost:6379
+
+## Optional Local LLM Runtime
+
+The Ollama service is optional and uses a Docker Compose profile.
+
+Start the platform with Ollama:
+
+    docker compose --profile llm up --build
+
+Ollama is available on the host at:
+
+    http://localhost:11434
+
 ## Default Strategy Profile
 
 The initial profile is:
@@ -163,24 +201,3 @@ Default values:
 - Recommendations: after market close plus manual run
 - Outcome tracking: after market close
 - Learning report: weekly
-
-## Core Output
-
-Each completed opportunity review should produce an action suggestion package with:
-
-- final_action_label
-- lifecycle_state
-- priority_score
-- confidence_score
-- confidence_breakdown
-- suggested_action_summary
-- entry_condition
-- option_contract_criteria
-- invalidation_condition
-- upgrade_condition
-- downgrade_condition
-- watch_condition
-- next_review_trigger
-- decision_trace
-- version_stamp
-- action_items

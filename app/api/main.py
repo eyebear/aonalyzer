@@ -6,10 +6,7 @@ settings = get_settings()
 
 app = FastAPI(
     title=settings.app_name,
-    description=(
-        "Local, Dockerized, AI-assisted equity and options research operating system. "
-        "Research-only. No broker integration. No auto-trading."
-    ),
+    description="Local equity and options research platform.",
     version="0.1.0",
 )
 
@@ -30,9 +27,11 @@ def system_status() -> dict:
         "status": "starting",
         "app_name": settings.app_name,
         "technical_name": settings.app_technical_name,
-        "research_only": True,
-        "broker_connected": False,
-        "auto_trading_enabled": False,
+        "environment": settings.app_env,
         "active_ai_provider": settings.active_ai_provider,
         "default_strategy_profile": settings.default_strategy_profile,
+        "postgres_host": settings.postgres_host,
+        "postgres_port": settings.postgres_port,
+        "redis_host": settings.redis_host,
+        "redis_port": settings.redis_port,
     }
