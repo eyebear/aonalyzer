@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.routes.profile_routes import router as profile_router
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -7,8 +8,10 @@ settings = get_settings()
 app = FastAPI(
     title=settings.app_name,
     description="Local equity and options research platform.",
-    version="0.1.0",
+    version="0.2.0",
 )
+
+app.include_router(profile_router)
 
 
 @app.get("/health")

@@ -38,6 +38,13 @@ class AppSettings(BaseSettings):
 
     default_strategy_profile: str = "Balanced Research Default"
 
+    market_data_refresh_minutes: int = 30
+    option_chain_refresh_minutes: int = 60
+    news_refresh_minutes: int = 60
+    watchlist_news_refresh_minutes: int = 30
+    filing_refresh_minutes: int = 60
+    iv_risk_refresh_minutes: int = 60
+
     exports_dir: str = "exports"
     models_dir: str = "models"
     reports_dir: str = "reports"
