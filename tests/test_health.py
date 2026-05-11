@@ -22,7 +22,7 @@ def test_system_status_returns_local_infrastructure_settings() -> None:
     assert response.status_code == 200
     body = response.json()
 
-    assert body["status"] == "starting"
+    assert body["status"] == "running"
     assert body["app_name"] == "Ao Ao Analyzer"
     assert body["technical_name"] == "aoaoanalyzer"
     assert body["default_strategy_profile"] == "Balanced Research Default"

@@ -40,6 +40,8 @@ services:
       context: .
       dockerfile: Dockerfile.api
     container_name: aoaoanalyzer-api
+    env_file:
+      - .env
     environment:
       APP_NAME: "Ao Ao Analyzer"
       APP_TECHNICAL_NAME: "aoaoanalyzer"
@@ -79,6 +81,8 @@ services:
       context: .
       dockerfile: Dockerfile.agent
     container_name: aoaoanalyzer-agent
+    env_file:
+      - .env
     environment:
       APP_NAME: "Ao Ao Analyzer"
       APP_TECHNICAL_NAME: "aoaoanalyzer"
