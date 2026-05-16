@@ -69,6 +69,33 @@ class ManualRefreshController:
             records_created=0,
         )
 
+    def refresh_macro(self, session: Session) -> AgentRun:
+        return self._run_placeholder_job(
+            session=session,
+            job_name="macro_refresh",
+            triggered_by="USER",
+            trigger_source="API",
+            records_created=0,
+        )
+
+    def refresh_technical(self, session: Session) -> AgentRun:
+        return self._run_placeholder_job(
+            session=session,
+            job_name="technical_refresh",
+            triggered_by="USER",
+            trigger_source="API",
+            records_created=0,
+        )
+
+    def refresh_stock_setup(self, session: Session) -> AgentRun:
+        return self._run_placeholder_job(
+            session=session,
+            job_name="stock_setup_refresh",
+            triggered_by="USER",
+            trigger_source="API",
+            records_created=0,
+        )
+
     def refresh_iv_risk(self, session: Session) -> AgentRun:
         return self._run_placeholder_job(
             session=session,

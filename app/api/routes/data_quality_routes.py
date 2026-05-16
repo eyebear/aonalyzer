@@ -24,8 +24,11 @@ DEFAULT_DATA_CATEGORIES = [
     "option_chain",
     "news",
     "filings",
+    "macro",
+    "company_ir",
     "earnings_calendar",
     "iv_data",
+    "iv_history",
     "memory",
 ]
 

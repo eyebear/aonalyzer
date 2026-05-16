@@ -66,6 +66,36 @@ class ScheduledJobRegistry:
                 description="Test manual refresh logging.",
                 default_trigger="manual",
             ),
+            "macro_refresh": RegisteredJob(
+                job_name="macro_refresh",
+                job_type="MACRO",
+                description="Refresh macro economic events.",
+                default_trigger="manual_or_schedule",
+            ),
+            "company_ir_refresh": RegisteredJob(
+                job_name="company_ir_refresh",
+                job_type="COMPANY_IR",
+                description="Refresh company investor relations events.",
+                default_trigger="manual_or_schedule",
+            ),
+            "technical_refresh": RegisteredJob(
+                job_name="technical_refresh",
+                job_type="TECHNICAL",
+                description=(
+                    "Compute technical-analysis snapshots from stored daily prices."
+                ),
+                default_trigger="manual_or_schedule",
+            ),
+            "stock_setup_refresh": RegisteredJob(
+                job_name="stock_setup_refresh",
+                job_type="STOCK_SETUP",
+                description=(
+                    "Compute support/resistance, entry, target, stop, and "
+                    "risk/reward setup math from stored prices and the latest "
+                    "technical snapshot."
+                ),
+                default_trigger="manual_or_schedule",
+            ),
         }
 
     def list_jobs(self) -> list[RegisteredJob]:

@@ -36,9 +36,12 @@ class DataFreshnessChecker:
         "market_data": 30,
         "option_chain": 60,
         "news": 60,
-        "filings": 60,
+        "filings": 240,
+        "macro": 720,
+        "company_ir": 1440,
         "earnings_calendar": 1440,
         "iv_data": 60,
+        "iv_history": 1440,
         "memory": 10080,
     }
 
@@ -414,6 +417,131 @@ class DataQualityChecker:
             context={
                 "actual_rows": len(rows),
             },
+        )
+
+    def check_filing_data(
+        self,
+        filing_rows: list[dict[str, Any]] | None,
+        symbol: str | None = None,
+    ) -> DataQualityResult:
+        rows = filing_rows or []
+
+        if not rows:
+            return DataQualityResult(
+                label=DataSufficiencyLabel.INSUFFICIENT_FILING_DATA,
+                data_category="filings",
+                symbol=symbol,
+                reason="No filing records are available.",
+                severity=DataQualitySeverity.WARNING,
+                context={
+                    "actual_rows": 0,
+                },
+            )
+
+        return DataQualityResult(
+            label=DataSufficiencyLabel.SUFFICIENT,
+            data_category="filings",
+            symbol=symbol,
+            reason="Filing data is sufficient.",
+            severity=DataQualitySeverity.INFO,
+            context={
+                "actual_rows": len(rows),
+            },
+        )
+
+    def check_macro_data(
+        self,
+        macro_rows: list[dict[str, Any]] | None,
+    ) -> DataQualityResult:
+        rows = macro_rows or []
+
+        if not rows:
+            return DataQualityResult(
+                label=DataSufficiencyLabel.INSUFFICIENT_MACRO_DATA,
+                data_category="macro",
+                symbol=None,
+                reason="No macro records are available.",
+                severity=DataQualitySeverity.WARNING,
+                context={
+                    "actual_rows": 0,
+                },
+            )
+
+        return DataQualityResult(
+            label=DataSufficiencyLabel.SUFFICIENT,
+            data_category="macro",
+            symbol=None,
+            reason="Macro data is sufficient.",
+            severity=DataQualitySeverity.INFO,
+            context={
+                "actual_rows": len(rows),
+            },
+        )
+
+    def check_earnings_calendar_data(
+        self,
+        earnings_rows: list[dict[str, Any]] | None,
+        symbol: str | None = None,
+    ) -> DataQualityResult:
+        rows = earnings_rows or []
+
+        if not rows:
+            return DataQualityResult(
+                label=DataSufficiencyLabel.EARNINGS_DATA_NOT_AVAILABLE,
+                data_category="earnings_calendar",
+                symbol=symbol,
+                reason="No earnings calendar rows are stored for this symbol.",
+                severity=DataQualitySeverity.WARNING,
+                context={"actual_rows": 0},
+            )
+
+        return DataQualityResult(
+            label=DataSufficiencyLabel.SUFFICIENT,
+            data_category="earnings_calendar",
+            symbol=symbol,
+            reason="Earnings calendar data is available.",
+            severity=DataQualitySeverity.INFO,
+            context={"actual_rows": len(rows)},
+        )
+
+    def check_iv_history_data(
+        self,
+        iv_history_rows: list[dict[str, Any]] | None,
+        symbol: str | None = None,
+        minimum_rows: int = 30,
+    ) -> DataQualityResult:
+        rows = iv_history_rows or []
+
+        if not rows:
+            return DataQualityResult(
+                label=DataSufficiencyLabel.IV_DATA_NOT_AVAILABLE,
+                data_category="iv_history",
+                symbol=symbol,
+                reason="No IV history rows are stored for this symbol.",
+                severity=DataQualitySeverity.WARNING,
+                context={"actual_rows": 0, "required_rows": minimum_rows},
+            )
+
+        if len(rows) < minimum_rows:
+            return DataQualityResult(
+                label=DataSufficiencyLabel.INSUFFICIENT_IV_HISTORY,
+                data_category="iv_history",
+                symbol=symbol,
+                reason=(
+                    f"IV history is insufficient. Need at least {minimum_rows} "
+                    f"rows, found {len(rows)}."
+                ),
+                severity=DataQualitySeverity.WARNING,
+                context={"actual_rows": len(rows), "required_rows": minimum_rows},
+            )
+
+        return DataQualityResult(
+            label=DataSufficiencyLabel.SUFFICIENT,
+            data_category="iv_history",
+            symbol=symbol,
+            reason="IV history is sufficient.",
+            severity=DataQualitySeverity.INFO,
+            context={"actual_rows": len(rows), "required_rows": minimum_rows},
         )
 
     def check_memory_data(

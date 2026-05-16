@@ -7,11 +7,18 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from app.agent.agent_status_reporter import agent_status_reporter
+from app.agent.earnings_calendar_refresh_job import run_earnings_calendar_refresh_job
+from app.agent.filing_refresh_job import run_filing_refresh_job
+from app.agent.iv_risk_refresh_job import run_iv_risk_refresh_job
+from app.agent.macro_refresh_job import run_macro_refresh_job
 from app.agent.manual_refresh_controller import manual_refresh_controller
 from app.agent.market_data_refresh_job import run_market_data_refresh_job
+from app.agent.news_refresh_job import run_news_refresh_job
 from app.agent.option_chain_refresh_job import run_option_chain_refresh_job
 from app.agent.scan_schedule_manager import scan_schedule_manager
 from app.agent.scheduler import agent_scheduler
+from app.agent.stock_setup_refresh_job import run_stock_setup_refresh_job
+from app.agent.technical_refresh_job import run_technical_refresh_job
 from app.api.dto import (
     AgentRunListResponse,
     AgentRunResponse,
@@ -35,6 +42,36 @@ class MarketDataRefreshRequest(BaseModel):
 class OptionChainRefreshRequest(BaseModel):
     symbols: list[str] | None = None
     max_expirations: int = 4
+
+
+class NewsRefreshRequest(BaseModel):
+    symbols: list[str] | None = None
+
+
+class FilingRefreshRequest(BaseModel):
+    symbols: list[str] | None = None
+
+
+class MacroRefreshRequest(BaseModel):
+    pass
+
+
+class TechnicalRefreshRequest(BaseModel):
+    symbols: list[str] | None = None
+
+
+class EarningsRefreshRequest(BaseModel):
+    symbols: list[str] | None = None
+    skip_risk_snapshot: bool = False
+
+
+class IvRiskRefreshRequest(BaseModel):
+    symbols: list[str] | None = None
+    skip_history_fetch: bool = False
+
+
+class StockSetupRefreshRequest(BaseModel):
+    symbols: list[str] | None = None
 
 
 def _agent_run_to_response(agent_run) -> AgentRunResponse:
@@ -147,28 +184,124 @@ def refresh_options(
     )
 
 
-@router.post("/refresh/news", response_model=AgentRunResponse)
-def refresh_news(session: Session = Depends(get_db_session)) -> AgentRunResponse:
-    run = manual_refresh_controller.refresh_news(session)
-    return _agent_run_to_response(run)
+@router.post("/refresh/news")
+def refresh_news(
+    request: NewsRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_news(session)
+        return _agent_run_to_response(run)
+
+    return run_news_refresh_job(
+        db=session,
+        symbols=request.symbols,
+        triggered_by="USER",
+        trigger_source="API",
+    )
 
 
-@router.post("/refresh/filings", response_model=AgentRunResponse)
-def refresh_filings(session: Session = Depends(get_db_session)) -> AgentRunResponse:
-    run = manual_refresh_controller.refresh_filings(session)
-    return _agent_run_to_response(run)
+@router.post("/refresh/filings")
+def refresh_filings(
+    request: FilingRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_filings(session)
+        return _agent_run_to_response(run)
+
+    return run_filing_refresh_job(
+        db=session,
+        symbols=request.symbols,
+        triggered_by="USER",
+        trigger_source="API",
+    )
 
 
-@router.post("/refresh/earnings", response_model=AgentRunResponse)
-def refresh_earnings(session: Session = Depends(get_db_session)) -> AgentRunResponse:
-    run = manual_refresh_controller.refresh_earnings(session)
-    return _agent_run_to_response(run)
+@router.post("/refresh/macro")
+def refresh_macro(
+    request: MacroRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_macro(session)
+        return _agent_run_to_response(run)
+
+    return run_macro_refresh_job(
+        db=session,
+        triggered_by="USER",
+        trigger_source="API",
+    )
 
 
-@router.post("/refresh/iv-risk", response_model=AgentRunResponse)
-def refresh_iv_risk(session: Session = Depends(get_db_session)) -> AgentRunResponse:
-    run = manual_refresh_controller.refresh_iv_risk(session)
-    return _agent_run_to_response(run)
+@router.post("/refresh/technical")
+def refresh_technical(
+    request: TechnicalRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_technical(session)
+        return _agent_run_to_response(run)
+
+    return run_technical_refresh_job(
+        db=session,
+        symbols=request.symbols,
+        triggered_by="USER",
+        trigger_source="API",
+    )
+
+
+@router.post("/refresh/stock-setup")
+def refresh_stock_setup(
+    request: StockSetupRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_stock_setup(session)
+        return _agent_run_to_response(run)
+
+    return run_stock_setup_refresh_job(
+        db=session,
+        symbols=request.symbols,
+        triggered_by="USER",
+        trigger_source="API",
+    )
+
+
+@router.post("/refresh/earnings")
+def refresh_earnings(
+    request: EarningsRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_earnings(session)
+        return _agent_run_to_response(run)
+
+    return run_earnings_calendar_refresh_job(
+        db=session,
+        symbols=request.symbols,
+        triggered_by="USER",
+        trigger_source="API",
+        skip_risk_snapshot=request.skip_risk_snapshot,
+    )
+
+
+@router.post("/refresh/iv-risk")
+def refresh_iv_risk(
+    request: IvRiskRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_iv_risk(session)
+        return _agent_run_to_response(run)
+
+    return run_iv_risk_refresh_job(
+        db=session,
+        symbols=request.symbols,
+        triggered_by="USER",
+        trigger_source="API",
+        skip_history_fetch=request.skip_history_fetch,
+    )
 
 
 @router.post("/run/recommendations", response_model=AgentRunResponse)
