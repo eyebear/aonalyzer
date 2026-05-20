@@ -3,7 +3,6 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
-
 DEFAULT_FRESH_WINDOW_HOURS = 24
 DEFAULT_STALE_WINDOW_DAYS = 7
 

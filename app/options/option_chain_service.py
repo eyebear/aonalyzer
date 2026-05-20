@@ -1,7 +1,4 @@
-from __future__ import annotations
-
-"""
-Phase 8 placeholder module.
+"""Phase 8 placeholder module.
 
 Real option-chain collection is intentionally disabled for now because:
 1. yfinance / Yahoo Options is currently blocked or rate-limited.
@@ -15,9 +12,13 @@ Future implementation should replace this file with a real provider-based option
 chain collector.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from typing import Any
+
+from app.common.service_utils import normalize_symbols
 
 
 @dataclass(frozen=True)
@@ -270,20 +271,14 @@ class OptionChainService:
         return None
 
     def load_watchlist_symbols(self, db) -> list[str]:
-        """
-        Placeholder.
+        """Intentional Phase 8 placeholder.
 
-        Real implementation should load active tickers from database.
+        Option-chain collection is non-blocking and not wired to the watchlist;
+        this deliberately returns ``[]`` (it does NOT use the shared
+        ``load_watchlist_symbols`` loader) so option work never drives or blocks
+        stock-only analysis. Kept explicit rather than delegated.
         """
         return []
 
     def _normalize_symbols(self, symbols: list[str]) -> list[str]:
-        normalized = []
-
-        for symbol in symbols:
-            clean_symbol = symbol.strip().upper()
-
-            if clean_symbol and clean_symbol not in normalized:
-                normalized.append(clean_symbol)
-
-        return normalized
+        return normalize_symbols(symbols)

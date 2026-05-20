@@ -6,14 +6,13 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.data_quality.data_quality_models import DataFreshness
+from app.database.base import Base
+from app.database.connection import SessionLocal, engine
 from app.market_data.market_data_models import (
     DailyPrice,
     FailedTickerLog,
     IntradayPrice,
 )
-from app.database.base import Base
-from app.database.connection import SessionLocal, engine
-
 
 router = APIRouter(prefix="/api/agent", tags=["market-data"])
 

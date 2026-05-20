@@ -6,9 +6,9 @@ from typing import Any, Protocol
 
 from sqlalchemy.orm import Session
 
+from app.common.service_utils import ensure_tables, normalize_symbols
 from app.data_quality.data_quality_models import DataFreshness
 from app.data_quality.data_sufficiency_labels import DataFreshnessStatus
-from app.database.base import Base
 from app.earnings.earnings_models import EarningsEvent
 from app.earnings.sources.yahoo_earnings_source import YahooEarningsCalendarSource
 
@@ -76,7 +76,7 @@ class EarningsCalendarService:
         )
 
     def ensure_tables(self, db: Session) -> None:
-        Base.metadata.create_all(bind=db.get_bind())
+        ensure_tables(db)
 
     def refresh_ticker_earnings(
         self,
@@ -293,12 +293,7 @@ class EarningsCalendarService:
         return text_value or None
 
     def _normalize_symbols(self, symbols: list[str]) -> list[str]:
-        normalized: list[str] = []
-        for s in symbols:
-            clean = s.strip().upper()
-            if clean and clean not in normalized:
-                normalized.append(clean)
-        return normalized
+        return normalize_symbols(symbols)
 
 
 __all__ = [

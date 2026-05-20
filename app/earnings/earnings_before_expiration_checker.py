@@ -6,7 +6,6 @@ from datetime import date, datetime, timezone
 from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
-
 # Tri-state encoded explicitly so callers don't conflate "no info" with
 # "no option supplied." NOT_APPLICABLE is the safe default when stock-only
 # research is happening.

@@ -2,6 +2,15 @@
 
 Aonalyzer is a local equity and options research platform for structured market review, option suitability analysis, decision traceability, memory, and learning.
 
+## Project Status
+
+Aonalyzer is built in sequential, independently testable phases.
+
+- **Completed: Phases 0–18.** This covers the project and local runtime foundation, centralized configuration and strategy profiles, the database and FastAPI foundations, the agent scheduler and refresh framework, data-quality and data-sufficiency tracking, market data collection, manual option handling, news/filings/macro/event normalization, the earnings calendar and optional IV history, the technical-analysis engine, support/resistance/entry/target/stop math, market regime and sector strength, stock setup detection, the optional option-suitability engine, the pretrained-model layer foundation, the AI provider manager, and AI-assisted event and manual-option-text analysis.
+- **Next planned: Phase 19 — Data Sufficiency Gate**, which separates blocking stock-data issues from non-blocking option, news, IV, earnings, and memory warnings.
+
+The platform is stock-first and non-blocking by design: option data is always optional, and missing or incomplete option data never blocks stock-only analysis. The system never invents missing option values. AI providers and pretrained models are disabled by default; the system runs fully in a deterministic fallback mode and degrades gracefully when they are unavailable.
+
 ## Project Identity
 
 Display name:
@@ -142,6 +151,10 @@ Open the dashboard:
     http://localhost:8501
 
 ## Docker Setup
+
+Create your local environment file (the API and agent services read it):
+
+    cp .env.example .env
 
 Build and start the local platform:
 

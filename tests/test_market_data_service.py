@@ -4,12 +4,12 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from app.data_quality.data_quality_models import DataFreshness
+from app.database.base import Base
 from app.market_data.market_data_models import (
     DailyPrice,
     FailedTickerLog,
     IntradayPrice,
 )
-from app.database.base import Base
 from app.market_data.market_data_service import (
     MarketDataService,
     OHLCVRow,

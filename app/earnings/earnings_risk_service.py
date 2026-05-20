@@ -6,7 +6,7 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
-from app.database.base import Base
+from app.common.service_utils import ensure_tables, normalize_symbols
 from app.earnings.days_to_earnings_calculator import (
     DaysToEarningsResult,
     calculate_days_to_earnings,
@@ -19,7 +19,6 @@ from app.earnings.earnings_before_expiration_checker import (
 )
 from app.earnings.earnings_models import EarningsRiskSnapshot
 from app.profiles.profile_manager import profile_manager
-
 
 RISK_LABEL_EARNINGS_BEFORE_EXPIRATION = "EARNINGS_BEFORE_EXPIRATION"
 RISK_LABEL_EARNINGS_INSIDE_WINDOW = "EARNINGS_INSIDE_WINDOW"
@@ -121,7 +120,7 @@ class EarningsRiskService:
         self._override_window_days = earnings_risk_window_days
 
     def ensure_tables(self, db: Session) -> None:
-        Base.metadata.create_all(bind=db.get_bind())
+        ensure_tables(db)
 
     def compute_for_symbol(
         self,
@@ -308,12 +307,7 @@ class EarningsRiskService:
         return result
 
     def _normalize_symbols(self, symbols: list[str]) -> list[str]:
-        normalized: list[str] = []
-        for s in symbols:
-            clean = s.strip().upper()
-            if clean and clean not in normalized:
-                normalized.append(clean)
-        return normalized
+        return normalize_symbols(symbols)
 
 
 __all__ = [

@@ -96,6 +96,27 @@ class ScheduledJobRegistry:
                 ),
                 default_trigger="manual_or_schedule",
             ),
+            "market_regime_refresh": RegisteredJob(
+                job_name="market_regime_refresh",
+                job_type="MARKET_REGIME",
+                description=(
+                    "Compute broad market regime (SPY/QQQ/IWM trend, VIX state, "
+                    "10Y-yield pressure) and sector relative strength from stored "
+                    "daily prices."
+                ),
+                default_trigger="manual_or_schedule",
+            ),
+            "setup_detection_refresh": RegisteredJob(
+                job_name="setup_detection_refresh",
+                job_type="SETUP_DETECTION",
+                description=(
+                    "Detect stock setup type (pullback/breakout-retest/sector-"
+                    "strength long, breakdown short, oversold-bounce watch, or "
+                    "no-trade) with a quality score from technical, setup, and "
+                    "regime context."
+                ),
+                default_trigger="manual_or_schedule",
+            ),
         }
 
     def list_jobs(self) -> list[RegisteredJob]:

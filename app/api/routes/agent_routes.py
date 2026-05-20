@@ -13,10 +13,12 @@ from app.agent.iv_risk_refresh_job import run_iv_risk_refresh_job
 from app.agent.macro_refresh_job import run_macro_refresh_job
 from app.agent.manual_refresh_controller import manual_refresh_controller
 from app.agent.market_data_refresh_job import run_market_data_refresh_job
+from app.agent.market_regime_refresh_job import run_market_regime_refresh_job
 from app.agent.news_refresh_job import run_news_refresh_job
 from app.agent.option_chain_refresh_job import run_option_chain_refresh_job
 from app.agent.scan_schedule_manager import scan_schedule_manager
 from app.agent.scheduler import agent_scheduler
+from app.agent.setup_detection_refresh_job import run_setup_detection_refresh_job
 from app.agent.stock_setup_refresh_job import run_stock_setup_refresh_job
 from app.agent.technical_refresh_job import run_technical_refresh_job
 from app.api.dto import (
@@ -71,6 +73,14 @@ class IvRiskRefreshRequest(BaseModel):
 
 
 class StockSetupRefreshRequest(BaseModel):
+    symbols: list[str] | None = None
+
+
+class MarketRegimeRefreshRequest(BaseModel):
+    fetch_missing: bool = False
+
+
+class SetupDetectionRefreshRequest(BaseModel):
     symbols: list[str] | None = None
 
 
@@ -261,6 +271,40 @@ def refresh_stock_setup(
         return _agent_run_to_response(run)
 
     return run_stock_setup_refresh_job(
+        db=session,
+        symbols=request.symbols,
+        triggered_by="USER",
+        trigger_source="API",
+    )
+
+
+@router.post("/refresh/market-regime")
+def refresh_market_regime(
+    request: MarketRegimeRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_market_regime(session)
+        return _agent_run_to_response(run)
+
+    return run_market_regime_refresh_job(
+        db=session,
+        fetch_missing=request.fetch_missing,
+        triggered_by="USER",
+        trigger_source="API",
+    )
+
+
+@router.post("/refresh/setup-detection")
+def refresh_setup_detection(
+    request: SetupDetectionRefreshRequest | None = None,
+    session: Session = Depends(get_db_session),
+) -> AgentRunResponse | dict[str, Any]:
+    if request is None:
+        run = manual_refresh_controller.refresh_setup_detection(session)
+        return _agent_run_to_response(run)
+
+    return run_setup_detection_refresh_job(
         db=session,
         symbols=request.symbols,
         triggered_by="USER",

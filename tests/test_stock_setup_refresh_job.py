@@ -15,7 +15,6 @@ from app.database.models import AgentRun, DailyPrice
 from app.quant.stock_setup_models import StockSetup
 from app.quant.stock_setup_service import StockSetupService
 
-
 engine = create_engine(
     "sqlite://",
     connect_args={"check_same_thread": False},
@@ -68,16 +67,16 @@ def _seed_v_pattern_prices(session: Session, symbol: str) -> None:
         (102.0, 103.0, 99.0, 100.0),
     ]
     cursor = date(2026, 1, 1) - timedelta(days=len(series))
-    for index, (o, h, l, c) in enumerate(series):
+    for index, (open_p, high_p, low_p, close_p) in enumerate(series):
         session.add(
             DailyPrice(
                 symbol=symbol,
                 price_date=cursor + timedelta(days=index),
-                open_price=o,
-                high_price=h,
-                low_price=l,
-                close_price=c,
-                adjusted_close_price=c,
+                open_price=open_p,
+                high_price=high_p,
+                low_price=low_p,
+                close_price=close_p,
+                adjusted_close_price=close_p,
                 volume=100_000,
                 source="test",
             )

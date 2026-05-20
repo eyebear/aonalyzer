@@ -12,7 +12,6 @@ from app.database.base import Base
 from app.database.connection import get_db_session
 from app.quant.stock_setup_models import StockSetup
 
-
 engine = create_engine(
     "sqlite://",
     connect_args={"check_same_thread": False},

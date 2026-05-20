@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
+from app.agent.agent_run_recorder import record_agent_run
 from app.database.base import Base
 from app.database.connection import engine
 from app.market_data.market_data_service import MarketDataService
@@ -111,90 +110,7 @@ def run_market_data_refresh_job(
         }
 
 
-def record_agent_run(
-    db: Session,
-    job_name: str,
-    job_type: str,
-    status: str,
-    triggered_by: str,
-    trigger_source: str,
-    symbols_processed: int,
-    records_created: int,
-    records_updated: int,
-    records_failed: int,
-    error_message: str | None,
-    details: dict[str, Any],
-) -> bool:
-    inspector = inspect(db.get_bind())
-
-    if "agent_runs" not in inspector.get_table_names():
-        return False
-
-    table_columns = {
-        column["name"]
-        for column in inspector.get_columns("agent_runs")
-    }
-
-    now = datetime.now(timezone.utc)
-
-    candidate_values: dict[str, Any] = {
-        "job_name": job_name,
-        "job_type": job_type,
-        "status": status,
-        "triggered_by": triggered_by,
-        "trigger_source": trigger_source,
-        "symbols_processed": symbols_processed,
-        "records_created": records_created,
-        "records_updated": records_updated,
-        "records_failed": records_failed,
-        "error_message": error_message,
-        "message": error_message,
-        "details_json": details,
-        "result_json": details,
-        "started_at": now,
-        "finished_at": now,
-        "completed_at": now,
-        "created_at": now,
-        "updated_at": now,
-    }
-
-    insert_values = {
-        key: value
-        for key, value in candidate_values.items()
-        if key in table_columns
-    }
-
-    required_fallbacks = {
-        "job_name": job_name,
-        "job_type": job_type,
-        "status": status,
-        "triggered_by": triggered_by,
-        "trigger_source": trigger_source,
-        "symbols_processed": symbols_processed,
-        "records_created": records_created,
-        "records_updated": records_updated,
-        "records_failed": records_failed,
-        "started_at": now,
-        "finished_at": now,
-    }
-
-    for key, value in required_fallbacks.items():
-        if key in table_columns and key not in insert_values:
-            insert_values[key] = value
-
-    if not insert_values:
-        return False
-
-    column_sql = ", ".join(insert_values.keys())
-    value_sql = ", ".join(f":{key}" for key in insert_values.keys())
-
-    try:
-        db.execute(
-            text(f"INSERT INTO agent_runs ({column_sql}) VALUES ({value_sql})"),
-            insert_values,
-        )
-        db.commit()
-        return True
-    except Exception:
-        db.rollback()
-        return False
+# ``record_agent_run`` now lives in ``app.agent.agent_run_recorder``. It is
+# re-exported here so existing ``from app.agent.market_data_refresh_job import
+# record_agent_run`` call sites keep working unchanged.
+__all__ = ["record_agent_run", "run_market_data_refresh_job"]

@@ -96,6 +96,24 @@ class ManualRefreshController:
             records_created=0,
         )
 
+    def refresh_market_regime(self, session: Session) -> AgentRun:
+        return self._run_placeholder_job(
+            session=session,
+            job_name="market_regime_refresh",
+            triggered_by="USER",
+            trigger_source="API",
+            records_created=0,
+        )
+
+    def refresh_setup_detection(self, session: Session) -> AgentRun:
+        return self._run_placeholder_job(
+            session=session,
+            job_name="setup_detection_refresh",
+            triggered_by="USER",
+            trigger_source="API",
+            records_created=0,
+        )
+
     def refresh_iv_risk(self, session: Session) -> AgentRun:
         return self._run_placeholder_job(
             session=session,

@@ -15,7 +15,6 @@ from app.database.models import AgentRun, DailyPrice
 from app.quant.technical_analysis_service import TechnicalAnalysisService
 from app.quant.technical_snapshot_models import TechnicalSnapshot
 
-
 engine = create_engine(
     "sqlite://",
     connect_args={"check_same_thread": False},

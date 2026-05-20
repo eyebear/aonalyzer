@@ -6,6 +6,7 @@ from typing import Any, Protocol
 
 from sqlalchemy.orm import Session
 
+from app.common.service_utils import normalize_symbols
 from app.data_quality.data_quality_models import DataFreshness
 from app.data_quality.data_sufficiency_labels import DataFreshnessStatus
 from app.event_normalizer.event_labels import EventDataCategory
@@ -211,14 +212,7 @@ class FilingService:
         existing.details_json = details or {}
 
     def _normalize_symbols(self, symbols: list[str]) -> list[str]:
-        normalized: list[str] = []
-
-        for symbol in symbols:
-            clean = symbol.strip().upper()
-            if clean and clean not in normalized:
-                normalized.append(clean)
-
-        return normalized
+        return normalize_symbols(symbols)
 
 
 __all__ = [

@@ -26,16 +26,16 @@ def create_test_session():
 def _seed_prices(db, symbol: str, ohlcv_series: list[tuple[float, float, float, float]]) -> None:
     """ohlcv_series is a list of (open, high, low, close) tuples; one per day."""
     cursor = date(2026, 1, 1) - timedelta(days=len(ohlcv_series))
-    for index, (o, h, l, c) in enumerate(ohlcv_series):
+    for index, (open_p, high_p, low_p, close_p) in enumerate(ohlcv_series):
         db.add(
             DailyPrice(
                 symbol=symbol.upper(),
                 price_date=cursor + timedelta(days=index),
-                open_price=o,
-                high_price=h,
-                low_price=l,
-                close_price=c,
-                adjusted_close_price=c,
+                open_price=open_p,
+                high_price=high_p,
+                low_price=low_p,
+                close_price=close_p,
+                adjusted_close_price=close_p,
                 volume=100_000,
                 source="test",
             )

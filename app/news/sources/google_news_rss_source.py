@@ -5,7 +5,6 @@ from urllib.parse import quote_plus
 
 from app.news.sources.rss_fetcher import FeedparserRssFetcher, RssFetcher
 
-
 GOOGLE_NEWS_RSS_BASE = "https://news.google.com/rss/search"
 
 

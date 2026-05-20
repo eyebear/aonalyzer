@@ -10,7 +10,6 @@ from app.database.base import Base
 from app.database.connection import get_db_session
 from app.quant.technical_snapshot_models import TechnicalSnapshot
 
-
 router = APIRouter(prefix="/api/technical", tags=["technical"])
 
 

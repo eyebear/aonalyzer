@@ -142,7 +142,7 @@ def moving_average_convergence_divergence(
     fast_tail = fast_series[-overlap_length:]
     slow_tail = slow_series[-overlap_length:]
 
-    macd_series = [fast - slow for fast, slow in zip(fast_tail, slow_tail)]
+    macd_series = [fast - slow for fast, slow in zip(fast_tail, slow_tail, strict=False)]
     macd_value = macd_series[-1]
 
     if len(macd_series) < signal_period:
@@ -259,7 +259,7 @@ def _all_numeric(values: list[Any]) -> bool:
     for value in values:
         if value is None:
             return False
-        if not isinstance(value, (int, float)):
+        if not isinstance(value, int | float):
             return False
         if isinstance(value, float) and math.isnan(value):
             return False

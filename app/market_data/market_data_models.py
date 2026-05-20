@@ -3,6 +3,9 @@ from datetime import datetime, timezone
 from sqlalchemy import Column, DateTime, Integer, String, Text
 
 from app.database.base import Base
+
+# DailyPrice / IntradayPrice are defined in app.database.models and re-exported
+# here so the market-data layer can import all of its tables from one module.
 from app.database.models import DailyPrice, IntradayPrice
 
 
@@ -21,3 +24,6 @@ class FailedTickerLog(Base):
     reason = Column(Text, nullable=False)
 
     created_at = Column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
+__all__ = ["DailyPrice", "FailedTickerLog", "IntradayPrice"]

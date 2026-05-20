@@ -20,6 +20,16 @@ target-version = "py311"
 select = ["E", "F", "I", "B", "UP"]
 ignore = []
 
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI dependency markers are call-in-default-argument by design (B008).
+extend-immutable-calls = [
+    "fastapi.Depends",
+    "fastapi.Query",
+    "fastapi.Path",
+    "fastapi.Body",
+    "fastapi.Header",
+]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"

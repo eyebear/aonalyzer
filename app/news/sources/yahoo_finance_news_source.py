@@ -4,7 +4,6 @@ from typing import Any
 
 from app.news.sources.rss_fetcher import FeedparserRssFetcher, RssFetcher
 
-
 YAHOO_FINANCE_RSS_TEMPLATE = (
     "https://feeds.finance.yahoo.com/rss/2.0/headline"
     "?s={symbol}&region=US&lang=en-US"

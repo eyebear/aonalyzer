@@ -8,9 +8,7 @@ from app.iv_history.iv_models import IvHistoryDay, IvRiskSnapshot
 from app.iv_history.iv_risk_service import (
     RISK_LABEL_INSUFFICIENT_IV_HISTORY,
     RISK_LABEL_IV_DATA_NOT_AVAILABLE,
-    RISK_LABEL_IV_LOW,
     RISK_LABEL_IV_REJECT,
-    RISK_LABEL_IV_WARNING,
     IvRiskService,
 )
 

@@ -4,10 +4,13 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
-from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
-from app.database.base import Base
+from app.common.service_utils import (
+    ensure_tables,
+    load_watchlist_symbols,
+    normalize_symbols,
+)
 from app.database.models import DailyPrice
 from app.quant.stock_setup_models import StockSetup
 from app.quant.support_resistance import (
@@ -20,7 +23,6 @@ from app.quant.support_resistance import (
     detect_support_resistance,
 )
 from app.quant.technical_snapshot_models import TechnicalSnapshot
-
 
 SUFFICIENT = "SUFFICIENT"
 PARTIAL = "PARTIAL"
@@ -121,55 +123,10 @@ class StockSetupService:
         self.swing_window = swing_window
 
     def ensure_tables(self, db: Session) -> None:
-        Base.metadata.create_all(bind=db.get_bind())
+        ensure_tables(db)
 
     def load_watchlist_symbols(self, db: Session) -> list[str]:
-        inspector = inspect(db.get_bind())
-        table_names = set(inspector.get_table_names())
-
-        for table_name in ["tickers", "watchlists", "watchlist_symbols"]:
-            if table_name not in table_names:
-                continue
-
-            columns = {col["name"] for col in inspector.get_columns(table_name)}
-            symbol_column = self._select_first_available_column(
-                columns, ["symbol", "ticker", "ticker_symbol"]
-            )
-            if symbol_column is None:
-                continue
-
-            active_column = self._select_first_available_column(
-                columns, ["is_active", "active", "enabled"]
-            )
-
-            if active_column is None:
-                rows = db.execute(
-                    text(
-                        f"SELECT DISTINCT {symbol_column} AS symbol "
-                        f"FROM {table_name} "
-                        f"WHERE {symbol_column} IS NOT NULL "
-                        f"ORDER BY {symbol_column}"
-                    )
-                ).mappings().all()
-            else:
-                rows = db.execute(
-                    text(
-                        f"SELECT DISTINCT {symbol_column} AS symbol "
-                        f"FROM {table_name} "
-                        f"WHERE {symbol_column} IS NOT NULL "
-                        f"AND {active_column} = :active_value "
-                        f"ORDER BY {symbol_column}"
-                    ),
-                    {"active_value": True},
-                ).mappings().all()
-
-            symbols = self._normalize_symbols(
-                [str(row["symbol"]) for row in rows if row.get("symbol") is not None]
-            )
-            if symbols:
-                return symbols
-
-        return []
+        return load_watchlist_symbols(db)
 
     def compute_for_symbol(
         self,
@@ -432,23 +389,8 @@ class StockSetupService:
         db.commit()
         return result
 
-    def _select_first_available_column(
-        self,
-        columns: set[str],
-        candidates: list[str],
-    ) -> str | None:
-        for candidate in candidates:
-            if candidate in columns:
-                return candidate
-        return None
-
     def _normalize_symbols(self, symbols: list[str]) -> list[str]:
-        normalized: list[str] = []
-        for symbol in symbols:
-            clean = symbol.strip().upper()
-            if clean and clean not in normalized:
-                normalized.append(clean)
-        return normalized
+        return normalize_symbols(symbols)
 
 
 __all__ = [

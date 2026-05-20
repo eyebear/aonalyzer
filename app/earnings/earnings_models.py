@@ -1,14 +1,13 @@
 from datetime import datetime, timezone
 
 from sqlalchemy import (
+    JSON,
     Boolean,
     Column,
     Date,
     DateTime,
-    Float,
     Index,
     Integer,
-    JSON,
     String,
     Text,
     UniqueConstraint,

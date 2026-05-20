@@ -9,8 +9,6 @@ from sqlalchemy.orm import Session
 from app.database.models import Event
 from app.event_normalizer.content_hash import build_content_hash
 from app.event_normalizer.event_labels import (
-    EventType,
-    ImportanceLevel,
     KNOWN_EVENT_TYPES,
     KNOWN_IMPORTANCE_LEVELS,
 )

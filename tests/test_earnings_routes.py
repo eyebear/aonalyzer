@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
@@ -11,7 +11,6 @@ from app.api.main import app
 from app.database.base import Base
 from app.database.connection import get_db_session
 from app.earnings.earnings_models import EarningsEvent, EarningsRiskSnapshot
-
 
 engine = create_engine(
     "sqlite://",

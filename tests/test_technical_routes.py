@@ -12,7 +12,6 @@ from app.database.base import Base
 from app.database.connection import get_db_session
 from app.quant.technical_snapshot_models import TechnicalSnapshot
 
-
 engine = create_engine(
     "sqlite://",
     connect_args={"check_same_thread": False},

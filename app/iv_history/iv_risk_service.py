@@ -6,12 +6,11 @@ from typing import Any
 
 from sqlalchemy.orm import Session
 
-from app.database.base import Base
+from app.common.service_utils import ensure_tables, normalize_symbols
 from app.iv_history.iv_models import IvHistoryDay, IvRiskSnapshot
 from app.iv_history.iv_percentile_calculator import calculate_iv_percentile
 from app.iv_history.iv_rank_calculator import calculate_iv_rank
 from app.profiles.profile_manager import profile_manager
-
 
 DEFAULT_MINIMUM_IV_HISTORY_DAYS = 30
 
@@ -110,7 +109,7 @@ class IvRiskService:
         self._override_reject_threshold = iv_reject_threshold
 
     def ensure_tables(self, db: Session) -> None:
-        Base.metadata.create_all(bind=db.get_bind())
+        ensure_tables(db)
 
     def compute_for_symbol(
         self,
@@ -353,12 +352,7 @@ class IvRiskService:
         return result
 
     def _normalize_symbols(self, symbols: list[str]) -> list[str]:
-        normalized: list[str] = []
-        for s in symbols:
-            clean = s.strip().upper()
-            if clean and clean not in normalized:
-                normalized.append(clean)
-        return normalized
+        return normalize_symbols(symbols)
 
 
 __all__ = [

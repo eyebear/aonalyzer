@@ -97,6 +97,8 @@ def test_manual_refresh_endpoints_exist() -> None:
         "/api/agent/refresh/filings",
         "/api/agent/refresh/earnings",
         "/api/agent/refresh/iv-risk",
+        "/api/agent/refresh/market-regime",
+        "/api/agent/refresh/setup-detection",
         "/api/agent/run/recommendations",
     ]
 

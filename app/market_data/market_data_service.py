@@ -7,9 +7,9 @@ from typing import Any
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
+from app.common.service_utils import load_watchlist_symbols, normalize_symbols
 from app.data_quality.data_quality_models import DataFreshness
 from app.data_quality.data_sufficiency_labels import DataFreshnessStatus
 from app.market_data.market_data_models import (
@@ -401,30 +401,7 @@ class MarketDataService:
         self.source = source
 
     def load_watchlist_symbols(self, db: Session) -> list[str]:
-        table_priority = [
-            "tickers",
-            "watchlists",
-            "watchlist_symbols",
-            "user_watchlists",
-        ]
-
-        inspector = inspect(db.get_bind())
-        table_names = set(inspector.get_table_names())
-
-        for table_name in table_priority:
-            if table_name not in table_names:
-                continue
-
-            symbols = self._load_symbols_from_table(
-                db=db,
-                inspector=inspector,
-                table_name=table_name,
-            )
-
-            if symbols:
-                return symbols
-
-        return []
+        return load_watchlist_symbols(db)
 
     def refresh_market_data(
         self,
@@ -678,73 +655,8 @@ class MarketDataService:
         existing.last_checked_at = now
         existing.details_json = details or {}
 
-    def _load_symbols_from_table(
-        self,
-        db: Session,
-        inspector: Any,
-        table_name: str,
-    ) -> list[str]:
-        columns = {
-            column["name"]
-            for column in inspector.get_columns(table_name)
-        }
-
-        symbol_column = self._select_first_available_column(
-            columns=columns,
-            candidates=["symbol", "ticker", "ticker_symbol"],
-        )
-
-        if symbol_column is None:
-            return []
-
-        active_column = self._select_first_available_column(
-            columns=columns,
-            candidates=["is_active", "active", "enabled"],
-        )
-
-        if active_column is None:
-            sql = text(
-                f"SELECT DISTINCT {symbol_column} AS symbol FROM {table_name} "
-                f"WHERE {symbol_column} IS NOT NULL "
-                f"ORDER BY {symbol_column}"
-            )
-            rows = db.execute(sql).mappings().all()
-        else:
-            sql = text(
-                f"SELECT DISTINCT {symbol_column} AS symbol FROM {table_name} "
-                f"WHERE {symbol_column} IS NOT NULL "
-                f"AND {active_column} = :active_value "
-                f"ORDER BY {symbol_column}"
-            )
-            rows = db.execute(sql, {"active_value": True}).mappings().all()
-
-        return self._normalize_symbols(
-            [
-                str(row["symbol"])
-                for row in rows
-                if row.get("symbol") is not None
-            ]
-        )
-
-    def _select_first_available_column(
-        self,
-        columns: set[str],
-        candidates: list[str],
-    ) -> str | None:
-        for candidate in candidates:
-            if candidate in columns:
-                return candidate
-        return None
-
     def _normalize_symbols(self, symbols: list[str]) -> list[str]:
-        normalized = []
-
-        for symbol in symbols:
-            clean_symbol = symbol.strip().upper()
-            if clean_symbol and clean_symbol not in normalized:
-                normalized.append(clean_symbol)
-
-        return normalized
+        return normalize_symbols(symbols)
 
     def _as_date(self, value: datetime | date) -> date:
         if isinstance(value, datetime):

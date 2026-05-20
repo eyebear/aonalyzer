@@ -12,7 +12,6 @@ from app.database.base import Base
 from app.database.connection import get_db_session
 from app.iv_history.iv_models import IvHistoryDay, IvRiskSnapshot
 
-
 engine = create_engine(
     "sqlite://",
     connect_args={"check_same_thread": False},

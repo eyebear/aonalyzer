@@ -15,7 +15,6 @@ from app.event_normalizer.event_labels import (
 )
 from app.event_normalizer.freshness import EventFreshnessChecker
 
-
 router = APIRouter(prefix="/api/events", tags=["events"])
 
 

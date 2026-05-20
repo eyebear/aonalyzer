@@ -5,7 +5,6 @@ from datetime import datetime, timedelta, timezone
 
 from app.event_normalizer.event_labels import EventType, ImportanceLevel
 
-
 HIGH_NEWS_KEYWORDS: tuple[str, ...] = (
     "earnings",
     "merger",

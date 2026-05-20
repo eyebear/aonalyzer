@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any
 
-
 EXPECTED_OPTION_FIELDS = [
     "symbol",
     "underlying_price",

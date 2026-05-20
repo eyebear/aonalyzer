@@ -10,7 +10,6 @@ from app.database.base import Base
 from app.database.connection import get_db_session
 from app.quant.stock_setup_models import StockSetup
 
-
 router = APIRouter(prefix="/api/setups", tags=["setups"])
 
 

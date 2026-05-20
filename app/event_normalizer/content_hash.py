@@ -4,7 +4,6 @@ import hashlib
 import re
 from datetime import datetime
 
-
 _WHITESPACE_PATTERN = re.compile(r"\s+")
 
 

@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session
 from app.database.connection import get_db_session
 from app.options.manual_option_input_service import ManualOptionInputService
 
-
 router = APIRouter(tags=["manual-options"])
 
 

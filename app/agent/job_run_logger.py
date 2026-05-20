@@ -1,6 +1,5 @@
 from collections.abc import Callable
 from datetime import datetime, timezone
-from time import perf_counter
 from typing import Any
 
 from sqlalchemy.orm import Session

@@ -1,0 +1,88 @@
+"""Provider and task type constants for the AI Provider Manager (Phase 17)."""
+
+from __future__ import annotations
+
+# Provider types.
+DISABLED = "DISABLED"
+MANUAL_PASTE = "MANUAL_PASTE"
+FREE_WEB_AI = "FREE_WEB_AI"
+GEMINI = "GEMINI"
+GROK = "GROK"
+OPENAI_COMPATIBLE = "OPENAI_COMPATIBLE"
+OLLAMA = "OLLAMA"
+LOCAL_LLM = "LOCAL_LLM"
+CUSTOM = "CUSTOM"
+
+ALL_PROVIDER_TYPES = [
+    DISABLED,
+    MANUAL_PASTE,
+    FREE_WEB_AI,
+    GEMINI,
+    GROK,
+    OPENAI_COMPATIBLE,
+    OLLAMA,
+    LOCAL_LLM,
+    CUSTOM,
+]
+
+# Task types used to route requests to a provider.
+TASK_GENERAL = "GENERAL"
+TASK_EVENT_ANALYSIS = "EVENT_ANALYSIS"
+TASK_OPTION_TEXT_READER = "OPTION_TEXT_READER"
+TASK_RESEARCH_CHAT = "RESEARCH_CHAT"
+TASK_DECISION_SUMMARY = "DECISION_SUMMARY"
+
+ALL_TASK_TYPES = [
+    TASK_GENERAL,
+    TASK_EVENT_ANALYSIS,
+    TASK_OPTION_TEXT_READER,
+    TASK_RESEARCH_CHAT,
+    TASK_DECISION_SUMMARY,
+]
+
+# Response statuses.
+OK = "OK"
+STATUS_DISABLED = "DISABLED"
+MANUAL_REQUIRED = "MANUAL_REQUIRED"
+NOT_CONFIGURED = "NOT_CONFIGURED"
+UNAVAILABLE = "UNAVAILABLE"
+RATE_LIMITED = "RATE_LIMITED"
+ERROR = "ERROR"
+
+# Statuses that did not yield a usable model answer.
+NON_OK_STATUSES = frozenset(
+    {STATUS_DISABLED, MANUAL_REQUIRED, NOT_CONFIGURED, UNAVAILABLE, RATE_LIMITED, ERROR}
+)
+
+
+def is_valid_provider_type(value: str) -> bool:
+    return value in ALL_PROVIDER_TYPES
+
+
+__all__ = [
+    "ALL_PROVIDER_TYPES",
+    "ALL_TASK_TYPES",
+    "CUSTOM",
+    "DISABLED",
+    "ERROR",
+    "FREE_WEB_AI",
+    "GEMINI",
+    "GROK",
+    "LOCAL_LLM",
+    "MANUAL_PASTE",
+    "MANUAL_REQUIRED",
+    "NON_OK_STATUSES",
+    "NOT_CONFIGURED",
+    "OK",
+    "OLLAMA",
+    "OPENAI_COMPATIBLE",
+    "RATE_LIMITED",
+    "STATUS_DISABLED",
+    "TASK_DECISION_SUMMARY",
+    "TASK_EVENT_ANALYSIS",
+    "TASK_GENERAL",
+    "TASK_OPTION_TEXT_READER",
+    "TASK_RESEARCH_CHAT",
+    "UNAVAILABLE",
+    "is_valid_provider_type",
+]

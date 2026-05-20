@@ -10,7 +10,6 @@ from app.database.base import Base
 from app.database.connection import get_db_session
 from app.earnings.earnings_models import EarningsEvent, EarningsRiskSnapshot
 
-
 router = APIRouter(prefix="/api/earnings", tags=["earnings"])
 
 

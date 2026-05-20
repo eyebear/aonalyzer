@@ -37,6 +37,8 @@ def test_scheduled_job_registry_contains_required_jobs() -> None:
     assert "filing_refresh" in job_names
     assert "earnings_refresh" in job_names
     assert "iv_risk_refresh" in job_names
+    assert "market_regime_refresh" in job_names
+    assert "setup_detection_refresh" in job_names
     assert "recommendation_run" in job_names
     assert "test_refresh" in job_names
 

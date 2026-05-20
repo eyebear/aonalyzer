@@ -3,11 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from app.quant.swing_detector import (
-    SwingPoint,
     latest_swing_high_above,
     latest_swing_low_below,
 )
-
 
 SETUP_DIRECTION_LONG = "LONG"
 SETUP_DIRECTION_UNDEFINED = "UNDEFINED"

@@ -1,19 +1,17 @@
-from __future__ import annotations
-
-"""
-Phase 8 placeholder refresh job.
+"""Phase 8 placeholder refresh job.
 
 This job intentionally records a successful placeholder run without fetching
 real option-chain data. Real option collection is deferred until a provider
 with usable API access is selected.
 """
 
-from datetime import datetime, timezone
+from __future__ import annotations
+
 from typing import Any
 
-from sqlalchemy import inspect, text
 from sqlalchemy.orm import Session
 
+from app.agent.agent_run_recorder import record_agent_run
 from app.options.option_chain_service import OptionChainService
 
 
@@ -69,72 +67,4 @@ def run_option_chain_refresh_job(
     }
 
 
-def record_agent_run(
-    db: Session,
-    job_name: str,
-    job_type: str,
-    status: str,
-    triggered_by: str,
-    trigger_source: str,
-    symbols_processed: int,
-    records_created: int,
-    records_updated: int,
-    records_failed: int,
-    error_message: str | None,
-    details: dict[str, Any],
-) -> bool:
-    inspector = inspect(db.get_bind())
-
-    if "agent_runs" not in inspector.get_table_names():
-        return False
-
-    table_columns = {
-        column["name"]
-        for column in inspector.get_columns("agent_runs")
-    }
-
-    now = datetime.now(timezone.utc)
-
-    candidate_values: dict[str, Any] = {
-        "job_name": job_name,
-        "job_type": job_type,
-        "status": status,
-        "triggered_by": triggered_by,
-        "trigger_source": trigger_source,
-        "symbols_processed": symbols_processed,
-        "records_created": records_created,
-        "records_updated": records_updated,
-        "records_failed": records_failed,
-        "error_message": error_message,
-        "message": details.get("message"),
-        "details_json": details,
-        "result_json": details,
-        "started_at": now,
-        "finished_at": now,
-        "completed_at": now,
-        "created_at": now,
-        "updated_at": now,
-    }
-
-    insert_values = {
-        key: value
-        for key, value in candidate_values.items()
-        if key in table_columns
-    }
-
-    if not insert_values:
-        return False
-
-    column_sql = ", ".join(insert_values.keys())
-    value_sql = ", ".join(f":{key}" for key in insert_values.keys())
-
-    try:
-        db.execute(
-            text(f"INSERT INTO agent_runs ({column_sql}) VALUES ({value_sql})"),
-            insert_values,
-        )
-        db.commit()
-        return True
-    except Exception:
-        db.rollback()
-        return False
+__all__ = ["record_agent_run", "run_option_chain_refresh_job"]

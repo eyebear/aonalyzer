@@ -15,7 +15,6 @@ from app.data_quality.data_quality_models import (
 from app.database.base import Base
 from app.database.connection import SessionLocal, engine
 
-
 router = APIRouter(prefix="/api/data-quality", tags=["data-quality"])
 
 
