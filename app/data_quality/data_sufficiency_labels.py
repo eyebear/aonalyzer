@@ -17,7 +17,18 @@ class DataSufficiencyLabel(str, Enum):
     INSUFFICIENT_IV_HISTORY = "INSUFFICIENT_IV_HISTORY"
     IV_DATA_NOT_AVAILABLE = "IV_DATA_NOT_AVAILABLE"
     EARNINGS_DATA_NOT_AVAILABLE = "EARNINGS_DATA_NOT_AVAILABLE"
+    # Legacy Phase 12/14 spelling, still emitted by ``stock_setup_service``.
     INSUFFICIENT_SETUP_DATA = "INSUFFICIENT_SETUP_DATA"
+    # Phase 19 canonical spelling. ``DataSufficiencyGate`` normalizes the legacy
+    # ``INSUFFICIENT_SETUP_DATA`` value to this when emitting gate-level
+    # blocking labels, while existing services and stored rows keep the legacy
+    # value unchanged.
+    INSUFFICIENT_STOCK_SETUP_DATA = "INSUFFICIENT_STOCK_SETUP_DATA"
+    # Phase 19 non-blocking marker for stock-only decisions when no option
+    # data was supplied. The option-suitability engine already uses this same
+    # string in ``app.options.option_suitability``; centralizing it here gives
+    # the gate a canonical enum member.
+    OPTION_DATA_NOT_AVAILABLE = "OPTION_DATA_NOT_AVAILABLE"
 
 
 class DataFreshnessStatus(str, Enum):

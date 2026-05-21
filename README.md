@@ -6,10 +6,10 @@ Aonalyzer is a local equity and options research platform for structured market 
 
 Aonalyzer is built in sequential, independently testable phases.
 
-- **Completed: Phases 0–18.** This covers the project and local runtime foundation, centralized configuration and strategy profiles, the database and FastAPI foundations, the agent scheduler and refresh framework, data-quality and data-sufficiency tracking, market data collection, manual option handling, news/filings/macro/event normalization, the earnings calendar and optional IV history, the technical-analysis engine, support/resistance/entry/target/stop math, market regime and sector strength, stock setup detection, the optional option-suitability engine, the pretrained-model layer foundation, the AI provider manager, and AI-assisted event and manual-option-text analysis.
-- **Next planned: Phase 19 — Data Sufficiency Gate**, which separates blocking stock-data issues from non-blocking option, news, IV, earnings, and memory warnings.
+- **Completed: Phases 0–26.** Phases 0–18 cover the project and local runtime foundation, centralized configuration and strategy profiles, the database and FastAPI foundations, the agent scheduler and refresh framework, data-quality and data-sufficiency tracking, market data collection, manual option handling, news/filings/macro/event normalization, the earnings calendar and optional IV history, the technical-analysis engine, support/resistance/entry/target/stop math, market regime and sector strength, stock setup detection, the optional option-suitability engine, the pretrained-model layer foundation, the AI provider manager, and AI-assisted event and manual-option-text analysis. Phase 19 added the data sufficiency gate that separates blocking stock-data issues from non-blocking option, news, IV, earnings, and memory warnings. Phase 20 added the hard filter gate that enforces non-negotiable stock rules (risk/reward, price extension, market regime, earnings risk) and optional option rules (DTE, target-vs-breakeven, spread, open interest, IV extreme). Phase 21 added the decision intelligence layer that combines the sufficiency and hard-filter outputs with event-risk and memory-risk into a final action label, priority score, confidence score, and decision trace. Phase 22 added the action suggestion layer that turns each final decision into a structured action package with entry condition, invalidation condition, upgrade/downgrade conditions, watch condition, next-review trigger guidance, and concrete action items. Phase 23 added rejection intelligence with a dedicated rejected-candidates and rejection-reasons store, per-cause explainers, and a "rejected but interesting" bucket. Phase 24 added Do-Not-Touch risk control with active freezes, an audit-trail history, release condition builder, and expiration monitor. Phase 25 added persistent opportunity lifecycle tracking across READY/WATCH/WAIT/WAIT_FOR_MANUAL_OPTION_INPUT/REJECTED/INSUFFICIENT_DATA states, with reactivation detection and user-review tracking. Phase 26 added the next-review trigger engine and review queue that arm per-symbol trigger conditions from the current lifecycle state and surface due reviews when those conditions fire.
+- **Next planned: Phase 27.**
 
-The platform is stock-first and non-blocking by design: option data is always optional, and missing or incomplete option data never blocks stock-only analysis. The system never invents missing option values. AI providers and pretrained models are disabled by default; the system runs fully in a deterministic fallback mode and degrades gracefully when they are unavailable.
+The platform is stock-first and non-blocking by design: option data is always optional, and missing or incomplete option data never blocks stock-only analysis. The system never invents missing option values. Missing option data is also never a rejection, never a Do-Not-Touch freeze, and never an automatic review queue entry on its own. AI providers and pretrained models are disabled by default; the system runs fully in a deterministic fallback mode and degrades gracefully when they are unavailable.
 
 ## Project Identity
 
@@ -31,13 +31,14 @@ aonalyzer
 - Option suitability analysis
 - Target versus breakeven analysis
 - Earnings and IV risk review
-- Data sufficiency checks
-- Hard filter checks
-- Action suggestion packages
-- Opportunity lifecycle tracking
-- Next review triggers
-- Do-Not-Touch risk controls
-- Rejected But Interesting workflow
+- Data sufficiency gate (Phase 19)
+- Hard filter gate (Phase 20)
+- Decision intelligence layer with priority and confidence scoring (Phase 21)
+- Action suggestion packages with entry/invalidation/upgrade/downgrade conditions and concrete action items (Phase 22)
+- Rejection intelligence with rejected-but-interesting bucket and per-cause explainers (Phase 23)
+- Do-Not-Touch temporary freezes with release conditions and expiration sweep (Phase 24)
+- Persistent opportunity lifecycle tracking with reactivation and user review (Phase 25)
+- Next-review trigger engine and review queue (Phase 26)
 - User action and override tracking
 - Outcome tracking
 - Case memory

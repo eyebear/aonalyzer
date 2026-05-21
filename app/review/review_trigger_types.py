@@ -1,0 +1,96 @@
+"""Phase 26 — Review trigger type and queue-status constants.
+
+Single source of truth for trigger type strings (including the new
+``RECHECK_AFTER_MANUAL_OPTION_INPUT``), queue statuses, queue
+priorities, and source phases. Keeping these in one module means the
+evaluators, engine, queue generator, routes, and tests never drift.
+"""
+
+from __future__ import annotations
+
+# --- Trigger types ----------------------------------------------------------
+
+TRIGGER_PRICE_ENTERED_ZONE = "PRICE_ENTERED_ZONE"
+TRIGGER_RECHECK_AFTER_MANUAL_OPTION_INPUT = "RECHECK_AFTER_MANUAL_OPTION_INPUT"
+TRIGGER_IV_COOLED_DOWN = "IV_COOLED_DOWN"
+TRIGGER_EARNINGS_AFTERMATH = "EARNINGS_AFTERMATH"
+TRIGGER_NEW_IMPORTANT_EVENT = "NEW_IMPORTANT_EVENT"
+TRIGGER_DATA_REFRESH_RESTORED = "DATA_REFRESH_RESTORED"
+
+ALL_TRIGGER_TYPES = frozenset(
+    {
+        TRIGGER_PRICE_ENTERED_ZONE,
+        TRIGGER_RECHECK_AFTER_MANUAL_OPTION_INPUT,
+        TRIGGER_IV_COOLED_DOWN,
+        TRIGGER_EARNINGS_AFTERMATH,
+        TRIGGER_NEW_IMPORTANT_EVENT,
+        TRIGGER_DATA_REFRESH_RESTORED,
+    }
+)
+
+# --- Queue statuses ---------------------------------------------------------
+
+QUEUE_STATUS_PENDING = "PENDING"
+QUEUE_STATUS_IN_REVIEW = "IN_REVIEW"
+QUEUE_STATUS_RESOLVED = "RESOLVED"
+QUEUE_STATUS_DISMISSED = "DISMISSED"
+
+ALL_QUEUE_STATUSES = frozenset(
+    {
+        QUEUE_STATUS_PENDING,
+        QUEUE_STATUS_IN_REVIEW,
+        QUEUE_STATUS_RESOLVED,
+        QUEUE_STATUS_DISMISSED,
+    }
+)
+
+ACTIVE_QUEUE_STATUSES = frozenset(
+    {QUEUE_STATUS_PENDING, QUEUE_STATUS_IN_REVIEW}
+)
+
+# --- Priority ranks for sorting --------------------------------------------
+
+PRIORITY_HIGH = "HIGH"
+PRIORITY_MEDIUM = "MEDIUM"
+PRIORITY_LOW = "LOW"
+
+# --- Source phases ---------------------------------------------------------
+
+SOURCE_PHASE_ENGINE = "NEXT_REVIEW_TRIGGER_ENGINE"
+SOURCE_PHASE_SCHEDULED_JOB = "SCHEDULED_REVIEW_TRIGGER_JOB"
+SOURCE_PHASE_USER = "USER"
+
+# --- Trigger priorities ----------------------------------------------------
+
+DEFAULT_TRIGGER_PRIORITY: dict[str, str] = {
+    TRIGGER_PRICE_ENTERED_ZONE: PRIORITY_HIGH,
+    TRIGGER_RECHECK_AFTER_MANUAL_OPTION_INPUT: PRIORITY_HIGH,
+    TRIGGER_IV_COOLED_DOWN: PRIORITY_MEDIUM,
+    TRIGGER_EARNINGS_AFTERMATH: PRIORITY_HIGH,
+    TRIGGER_NEW_IMPORTANT_EVENT: PRIORITY_MEDIUM,
+    TRIGGER_DATA_REFRESH_RESTORED: PRIORITY_MEDIUM,
+}
+
+
+__all__ = [
+    "ACTIVE_QUEUE_STATUSES",
+    "ALL_QUEUE_STATUSES",
+    "ALL_TRIGGER_TYPES",
+    "DEFAULT_TRIGGER_PRIORITY",
+    "PRIORITY_HIGH",
+    "PRIORITY_LOW",
+    "PRIORITY_MEDIUM",
+    "QUEUE_STATUS_DISMISSED",
+    "QUEUE_STATUS_IN_REVIEW",
+    "QUEUE_STATUS_PENDING",
+    "QUEUE_STATUS_RESOLVED",
+    "SOURCE_PHASE_ENGINE",
+    "SOURCE_PHASE_SCHEDULED_JOB",
+    "SOURCE_PHASE_USER",
+    "TRIGGER_DATA_REFRESH_RESTORED",
+    "TRIGGER_EARNINGS_AFTERMATH",
+    "TRIGGER_IV_COOLED_DOWN",
+    "TRIGGER_NEW_IMPORTANT_EVENT",
+    "TRIGGER_PRICE_ENTERED_ZONE",
+    "TRIGGER_RECHECK_AFTER_MANUAL_OPTION_INPUT",
+]

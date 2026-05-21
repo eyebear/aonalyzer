@@ -48,6 +48,15 @@ class StrategyProfile(BaseModel):
 
     hard_filters_can_be_bypassed: bool = False
 
+    # Phase 19 — data sufficiency gate requirement flags.
+    # These default to ``False`` so all existing stored / seeded profile JSON
+    # continues to load unchanged. The gate treats news / IV / earnings /
+    # memory as non-blocking warnings unless a profile explicitly opts in.
+    requires_news_data: bool = False
+    requires_iv_history: bool = False
+    requires_earnings_data: bool = False
+    requires_memory_data: bool = False
+
     @model_validator(mode="after")
     def validate_ranges(self) -> "StrategyProfile":
         if self.stock_thesis_horizon_min_trading_days > self.stock_thesis_horizon_max_trading_days:

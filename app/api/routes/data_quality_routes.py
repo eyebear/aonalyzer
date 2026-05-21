@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.data_quality.data_quality_checker import (
@@ -12,6 +12,7 @@ from app.data_quality.data_quality_models import (
     DataFreshness,
     InsufficientDataEvent,
 )
+from app.data_quality.data_sufficiency_gate import DataSufficiencyGate
 from app.database.base import Base
 from app.database.connection import SessionLocal, engine
 
@@ -180,4 +181,40 @@ def run_sample_data_quality_check(db: Session = Depends(get_db)) -> dict[str, An
         "status": "OK",
         "results": [result.to_dict() for result in results],
         "created_events": len(created_events),
+    }
+
+
+# --- Phase 19 -- Data Sufficiency Gate ---------------------------------------
+
+
+@router.get("/sufficiency/{symbol}")
+def get_data_sufficiency(
+    symbol: str,
+    option_data_requested: bool = Query(default=False),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    """Phase 19 entry point.
+
+    Reads existing per-domain rows (daily prices, stock setup, news events,
+    IV history, earnings calendar) and returns a deterministic
+    ``GateDecision`` JSON describing which insufficiencies block stock
+    analysis, which block option suitability only, and which are warnings
+    or confidence reducers.
+    """
+    ensure_data_quality_tables()
+
+    clean_symbol = (symbol or "").strip().upper()
+    if not clean_symbol:
+        raise HTTPException(status_code=400, detail="symbol is required.")
+
+    gate = DataSufficiencyGate()
+    decision = gate.evaluate_symbol(
+        db=db,
+        symbol=clean_symbol,
+        option_data_requested=option_data_requested,
+    )
+
+    return {
+        "status": "OK",
+        "decision": decision.to_dict(),
     }

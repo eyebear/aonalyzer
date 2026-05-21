@@ -128,6 +128,22 @@ class AppSettings(BaseSettings):
     # Only analyze events at/above this importance to control AI cost.
     event_analysis_min_importance: str = "HIGH"
 
+    # --- Phase 20: Hard Filter Gate ---
+    # Stock thesis -- minimum risk/reward used by the hard filter when no
+    # profile override is supplied; the profile's ``minimum_risk_reward``
+    # normally drives it.
+    hard_filter_min_stock_risk_reward: float = 2.0
+    # Price extension: a long is "chasing" when spot is too far above the
+    # nearest support relative to ATR. ``None`` for either threshold disables
+    # that specific check. Defaults are deliberately conservative; profiles
+    # may override later in Phase 22+.
+    hard_filter_max_atr_extension_multiple: float = 3.0
+    hard_filter_max_sma50_extension_percent: float = 15.0
+    # Earnings risk: when ``True`` (default) earnings inside the profile's
+    # risk window is a warning; when option expiration falls before
+    # earnings it is a hard fail. Profiles cannot bypass this.
+    hard_filter_earnings_inside_window_blocks: bool = False
+
     exports_dir: str = "exports"
     models_dir: str = "models"
     reports_dir: str = "reports"
