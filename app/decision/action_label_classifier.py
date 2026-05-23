@@ -75,7 +75,10 @@ def classify_action_label(
     if label == THESIS_NO_TRADE:
         return ActionLabel(
             final_label=NO_TRADE,
-            rationale="Stock thesis blocked by Phase 19 sufficiency or Phase 20 hard filters.",
+            rationale=(
+                "Stock thesis blocked by the data sufficiency check or the "
+                "non-negotiable risk filters."
+            ),
         )
 
     if label == THESIS_WATCH:

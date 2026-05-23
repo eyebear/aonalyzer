@@ -47,12 +47,30 @@ def build_opportunity_row(suggestion: dict[str, Any]) -> dict[str, Any]:
         "priority_score": suggestion.get("priority_score"),
         "confidence_score": suggestion.get("confidence_score"),
         "option_data_warning": warning,
-        "next_review_trigger": next_review.get("trigger_type")
-        or next_review.get("label")
-        or next_review,
+        "next_review_trigger": _next_review_text(next_review),
         "action_items": suggestion.get("action_items", []),
         "lifecycle_state": suggestion.get("lifecycle_state"),
     }
+
+
+def _next_review_text(next_review: Any) -> str:
+    """Always return readable text for the next-review column, never a dict."""
+    if not next_review:
+        return "—"
+    if isinstance(next_review, str):
+        return next_review
+    if isinstance(next_review, dict):
+        for key in ("trigger_type", "label", "description", "summary"):
+            value = next_review.get(key)
+            if value:
+                return str(value)
+        scalars = [
+            f"{key}: {value}"
+            for key, value in next_review.items()
+            if value not in (None, "", [], {}) and not isinstance(value, dict | list)
+        ]
+        return "; ".join(scalars) if scalars else "—"
+    return str(next_review)
 
 
 # --- Phase 31: Rejected But Interesting -------------------------------------

@@ -23,6 +23,7 @@ from app.dashboard.components.api_client import get_json, post_json  # noqa: E40
 from app.dashboard.components.ui_common import view_mode_selector  # noqa: E402
 from app.ui_experience.page_views import build_opportunity_row  # noqa: E402
 from app.ui_experience.render_helpers import (  # noqa: E402
+    action_label_display,
     format_score,
     instrument_scope_label,
 )
@@ -69,7 +70,7 @@ for suggestion in rows:
         continue
 
     header = (
-        f"**{view['ticker']}** · {view['final_action_label']} · "
+        f"**{view['ticker']}** · {action_label_display(view['final_action_label'])} · "
         f"{instrument_scope_label(view['instrument_scope'])}"
     )
     st.markdown(header)
@@ -87,12 +88,12 @@ for suggestion in rows:
         for item in view["action_items"]:
             st.write(f"- {item.get('description', item)}")
 
-    with st.expander("Details (checklist, trace, confidence, memory)"):
+    with st.expander("Raw diagnostics (checklist, trace, confidence, memory)"):
         if is_advanced(view_mode):
             st.json(suggestion)
         else:
             st.write("Switch to Advanced view to see traces and raw detail.")
-            st.write({"lifecycle_state": view["lifecycle_state"]})
+            st.write(f"Lifecycle state: {view['lifecycle_state'] or '—'}")
 
     # Feedback buttons (Phase 30.11) — recorded via lifecycle review state;
     # richer user-action capture arrives in Phase 38.

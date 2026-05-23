@@ -26,8 +26,9 @@ def get_option_chain_snapshots(
         "status": "OK",
         "placeholder": True,
         "message": (
-            "Phase 8 option-chain snapshots are currently a placeholder. "
-            "No real option snapshots are stored yet."
+            "Automatic option-chain collection is not enabled, so no option "
+            "snapshots are stored. Paste option contract data manually to "
+            "evaluate the option side."
         ),
         "symbol": symbol.upper() if symbol else None,
         "limit": limit,
@@ -43,8 +44,8 @@ def get_option_chain_freshness(
         "status": "OK",
         "placeholder": True,
         "message": (
-            "Phase 8 option-chain freshness is currently a placeholder. "
-            "No real option-chain provider is active yet."
+            "No automatic option-chain provider is active, so option-chain "
+            "freshness is not tracked."
         ),
         "freshness": None,
     }

@@ -1,7 +1,7 @@
 # Action Label Guide
 
 The final action label is the user-facing verdict produced by the decision
-layer (Phase 21). It maps deterministically from the stock thesis and the
+layer. It maps deterministically from the stock thesis and the
 instrument scope.
 
 | Label | Meaning | Option data? |
@@ -21,7 +21,7 @@ instrument scope.
 - `OPTION_AVAILABLE` — a manual option contract was evaluated and is suitable.
 - `OPTION_REJECTED` — a manual option contract was evaluated and failed filters.
 
-## Lifecycle states (Phase 25)
+## Lifecycle states
 
 `READY_FOR_RESEARCH`, `WATCHING`, `WAITING_FOR_ENTRY`,
 `WAIT_FOR_MANUAL_OPTION_INPUT`, `REJECTED`, `INSUFFICIENT_DATA`.

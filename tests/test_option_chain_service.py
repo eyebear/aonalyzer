@@ -19,7 +19,10 @@ def test_phase_8_placeholder_refresh_returns_successful_placeholder_result() -> 
     assert result.requested_symbols == ["SPY"]
     assert result.successful_symbols == ["SPY"]
     assert result.records_created == 0
-    assert "placeholder" in result.message.lower()
+    # The message must explain the limitation in product language without
+    # leaking internal phase numbering.
+    assert "not enabled" in result.message.lower()
+    assert "phase" not in result.message.lower()
 
 
 def test_option_calculations_are_kept_for_future_real_provider() -> None:

@@ -44,7 +44,7 @@ def decide_option_expression(
     rationale: list[str] = []
 
     if hard_filter.option_decision == OPTION_DECISION_ALLOWED:
-        rationale.append("Option passes all applicable Phase 20 hard filters.")
+        rationale.append("Option passes all applicable risk filters.")
         return OptionExpressionDecision(
             expression_label=OPTION_EXPR_OK,
             rationale=rationale,
@@ -52,7 +52,7 @@ def decide_option_expression(
 
     if hard_filter.option_decision == OPTION_DECISION_BLOCKED:
         rationale.append(
-            "Option fails one or more Phase 20 hard filters: "
+            "Option fails one or more risk filters: "
             + ", ".join(sorted(set(hard_filter.option_blocking_labels)))
         )
         return OptionExpressionDecision(

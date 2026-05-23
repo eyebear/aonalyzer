@@ -2,12 +2,12 @@
 
 Aonalyzer is a local equity and options research platform for structured market review, option suitability analysis, decision traceability, memory, and learning.
 
-## Project Status
+## Overview
 
-Aonalyzer is built in sequential, independently testable phases.
+Aonalyzer combines a data and analysis backbone with a research workflow layer:
 
-- **Completed: Phases 0–52.** Phases 0–26 established the foundation, configuration and profiles, database and FastAPI, the agent scheduler and refresh framework, data-quality and data-sufficiency tracking, market/option/news/filings/macro/earnings/IV collection, the technical-analysis engine, support/resistance/entry/target/stop math, market regime and sector strength, stock setup detection, the optional option-suitability engine, the pretrained-model layer, the AI provider manager, AI-assisted event and manual-option-text analysis, the data-sufficiency gate, the hard-filter gate, the decision intelligence layer, the action suggestion layer, rejection intelligence, Do-Not-Touch risk control, persistent opportunity lifecycle tracking, and the next-review trigger engine + review queue.
-- **Phases 27–52 (this milestone):** Today's Research Worklist (with the `PASTE_OPTION_DATA` item), the One-Page Ticker Brief, the progressive-disclosure dashboard (Home command center + beginner/advanced view), the Daily Opportunities / Rejected-But-Interesting / Do-Not-Touch / Ticker Analyzer / Manual Option Review / Earnings-IV Risk / News-Events pages, the AI Research Chat with seven answer modes, user-action & override tracking, signal-outcome tracking (5/10/20/30-day returns), rejection & Do-Not-Touch outcome tracking, case memory, vector memory (pgvector-ready, portable cosine fallback), skill memory & performance, weekly learning reports, the approval-gated improvement engine + champion/challenger, versioning & governance (eight version keys per decision + audit metadata), the Settings page, memory export/import (package + CLI), the end-to-end orchestration pipeline, the CI/CD workflows + quality gates, and the documentation set in `docs/`.
+- **Data & analysis** — configuration and strategy profiles, a PostgreSQL/Redis/FastAPI backbone, a scheduler and refresh framework, data-quality and data-sufficiency tracking, market/news/filings/macro/earnings/IV collection, a technical-analysis engine, support/resistance/entry/target/stop math, market regime and sector strength, stock setup detection, an optional option-suitability engine, a pretrained-model layer, an AI provider manager, AI-assisted event and manual-option-text analysis, the data-sufficiency and hard-filter gates, the decision intelligence and action suggestion layers, rejection intelligence, Do-Not-Touch risk control, persistent opportunity lifecycle tracking, and a next-review trigger engine with a review queue.
+- **Research workflow** — Today's Research Worklist, the One-Page Ticker Brief, a progressive-disclosure dashboard (Home command center + beginner/advanced view) with Daily Opportunities / Rejected-But-Interesting / Do-Not-Touch / Ticker Analyzer / Manual Option Review / Earnings-IV Risk / News-Events pages, an AI Research Chat with seven answer modes, user-action and override tracking, signal-outcome tracking (5/10/20/30-day returns), rejection and Do-Not-Touch outcome tracking, case memory, vector memory (pgvector-ready, with a portable cosine fallback), skill memory and performance, weekly learning reports, an approval-gated improvement engine with champion/challenger comparison, versioning and governance, a Settings page, memory export/import (package + CLI), an end-to-end orchestration pipeline, CI/CD quality gates, and the documentation set in `docs/`.
 
 The platform is stock-first and non-blocking by design: option data is always optional, and missing or incomplete option data never blocks stock-only analysis. The system never invents missing option values. Missing option data is also never a rejection, never a Do-Not-Touch freeze, and never an automatic review-queue entry on its own; outcome trackers record an absent option outcome as *unavailable* rather than zero or failed. The AI Research Chat uses only system context, states when option data is missing, and never overrides hard filters. Vector memory and improvement suggestions are supporting/advisory only and never change deterministic gates or production rules without explicit approval. The setting `allow_stock_only_when_options_missing` defaults to `true`. AI providers and pretrained models are disabled by default; the system runs fully in a deterministic fallback mode and degrades gracefully when they are unavailable.
 
@@ -50,14 +50,14 @@ aonalyzer
 - Option suitability analysis
 - Target versus breakeven analysis
 - Earnings and IV risk review
-- Data sufficiency gate (Phase 19)
-- Hard filter gate (Phase 20)
-- Decision intelligence layer with priority and confidence scoring (Phase 21)
-- Action suggestion packages with entry/invalidation/upgrade/downgrade conditions and concrete action items (Phase 22)
-- Rejection intelligence with rejected-but-interesting bucket and per-cause explainers (Phase 23)
-- Do-Not-Touch temporary freezes with release conditions and expiration sweep (Phase 24)
-- Persistent opportunity lifecycle tracking with reactivation and user review (Phase 25)
-- Next-review trigger engine and review queue (Phase 26)
+- Data sufficiency gate
+- Hard filter gate
+- Decision intelligence layer with priority and confidence scoring
+- Action suggestion packages with entry/invalidation/upgrade/downgrade conditions and concrete action items
+- Rejection intelligence with rejected-but-interesting bucket and per-cause explainers
+- Do-Not-Touch temporary freezes with release conditions and expiration sweep
+- Persistent opportunity lifecycle tracking with reactivation and user review
+- Next-review trigger engine and review queue
 - User action and override tracking
 - Outcome tracking
 - Case memory

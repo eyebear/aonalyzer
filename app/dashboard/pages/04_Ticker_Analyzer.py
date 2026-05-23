@@ -65,7 +65,18 @@ if b[4].button("Clear option session"):
 
 if st.session_state.get("ticker_chat"):
     with st.expander("AI answer", expanded=True):
-        st.json(st.session_state["ticker_chat"])
+        chat_resp = (st.session_state["ticker_chat"] or {}).get("response") or {}
+        if chat_resp.get("degraded"):
+            st.info(
+                f"Degraded mode ({chat_resp.get('provider_status', 'no provider')}) — "
+                "deterministic answer."
+            )
+        st.markdown(chat_resp.get("answer") or "No answer returned.")
+        if chat_resp.get("option_data_status"):
+            st.caption(f"Option data status: {chat_resp['option_data_status']}")
+        # Expanders cannot be nested; keep the raw payload as a collapsed widget.
+        st.caption("Raw diagnostics")
+        st.json(st.session_state["ticker_chat"], expanded=False)
 
 # --- One-Page Ticker Brief (Phase 33.4) ------------------------------------
 

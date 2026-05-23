@@ -97,4 +97,5 @@ if st.button("Compare rule versions (shadow test)"):
         {"champion_min_risk_reward": champ_rr, "challenger_min_risk_reward": chall_rr},
     )
     if result is not None:
-        st.json(result.get("comparison") or result)
+        with st.expander("Comparison result (raw diagnostics)", expanded=True):
+            st.json(result.get("comparison") or result)

@@ -169,8 +169,9 @@ def get_or_evaluate_lifecycle(
     evaluate: bool = Query(
         default=True,
         description=(
-            "When true (default), re-runs the Phase 22 chain and updates the "
-            "lifecycle row. When false, returns only the persisted state."
+            "When true (default), re-runs the decision and action chain and "
+            "updates the lifecycle row. When false, returns only the "
+            "persisted state."
         ),
     ),
     db: Session = Depends(get_db_session),

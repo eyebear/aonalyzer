@@ -176,7 +176,7 @@ def _classify_buckets(
             sorted(set(decision.hard_filter_decision.stock_blocking_labels or []))
         )
         summary = (
-            "Stock thesis rejected by the Phase 20 hard filter gate"
+            "Stock thesis rejected by the non-negotiable risk filters"
             + (f" ({blocks})" if blocks else "")
             + "."
         )

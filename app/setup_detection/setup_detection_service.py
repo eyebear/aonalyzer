@@ -254,7 +254,10 @@ class SetupDetectionService:
 
         notes = None
         if setup is None and technical is not None:
-            notes = "No Phase 12 setup math available; support/resistance/RR omitted."
+            notes = (
+                "No stored setup math is available for this ticker; "
+                "support/resistance and risk/reward are omitted."
+            )
 
         return SetupSignalComputation(
             symbol=clean,

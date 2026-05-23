@@ -54,8 +54,8 @@ _HEADLINES = {
 
 _BODIES = {
     FREEZE_CATEGORY_EARNINGS_BEFORE_EXPIRATION: (
-        "The Phase 20 hard-filter gate reports EARNINGS_BEFORE_OPTION_EXPIRATION. "
-        "The candidate is frozen until the earnings risk clears."
+        "The risk filters report that earnings fall before the option "
+        "expiration. The candidate is frozen until the earnings risk clears."
     ),
     FREEZE_CATEGORY_EXTREME_OPTION_VOLATILITY: (
         "The pasted option contract failed the IV reject threshold. The "

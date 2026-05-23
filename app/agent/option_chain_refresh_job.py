@@ -60,8 +60,9 @@ def run_option_chain_refresh_job(
         "agent_run_recorded": agent_run_recorded,
         "placeholder": True,
         "message": (
-            "Phase 8 option-chain collection is currently a placeholder. "
-            "No real option snapshots were fetched or stored."
+            "Automatic option-chain collection is not enabled; no option "
+            "snapshots were fetched or stored. Paste option contract data "
+            "manually to evaluate the option side."
         ),
         "result": details,
     }

@@ -16,7 +16,7 @@ never lets memory override deterministic decision gates.
   or too strict. `would_option_have_worked` stays `UNAVAILABLE` unless real
   option data existed (no fake backfill).
 
-### Case memory (Phase 41)
+### Case memory
 Reusable lessons built from outcomes, including the key case types
 `STOCK_RIGHT_OPTION_WRONG` (stock thesis right, option lost) and
 `STOCK_RIGHT_OPTION_MISSING` (stock right, no option data to evaluate), plus
@@ -24,7 +24,7 @@ Reusable lessons built from outcomes, including the key case types
 `DO_NOT_TOUCH`. Each case preserves its source reference, decision context,
 option-data availability, outcome type, and a plain-language lesson.
 
-### Vector memory (Phase 42)
+### Vector memory
 Embeds case memory, overrides, rejected cases, manual option snapshots, and
 action suggestions into `memory_embeddings`. Uses sentence-transformers when
 available, otherwise a deterministic hash embedding so search works offline.
@@ -32,7 +32,7 @@ pgvector is enabled best-effort on PostgreSQL; the portable cosine search works
 regardless. Vector memory is supporting context only — it influences
 confidence/warnings/explanations, never the deterministic gates or final label.
 
-### Skill memory (Phase 43)
+### Skill memory
 Named, versioned skills (e.g. `PULLBACK_LONG_SETUP`, `MANUAL_OPTION_TEXT_READER`,
 `OPTION_SUITABILITY_CHECK`, `BREAKEVEN_REALITY_CHECK`, `IV_RISK_FILTER`,
 `STOCK_RIGHT_OPTION_WRONG_ANALYZER`, ...) with measured performance: target-hit
@@ -40,13 +40,13 @@ rate, stop-first rate, stock-right/option-wrong rate, manual-option-reader
 usefulness, and an expected-value proxy. Metrics are recorded and exposed; skill
 behavior is never silently changed by them.
 
-### Learning reports (Phase 44)
+### Learning reports
 Weekly summaries of successes, failures, stock-right/option-wrong cases, manual
 option usage, rejected & Do-Not-Touch outcomes, user overrides, skill
 performance, and experience usage. Missing option data is reported as missing,
 never converted into option success/failure.
 
-### Improvement engine + champion/challenger (Phase 45)
+### Improvement engine + champion/challenger
 Generates explainable, **approval-gated** suggestions (DTE, IV threshold,
 breakeven margin, manual-option prompt, Do-Not-Touch, override-based). The
 champion/challenger engine shadow-tests a candidate rule against recorded

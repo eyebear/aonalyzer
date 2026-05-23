@@ -15,7 +15,7 @@
   0001 only enables it when the server ships it (the compose
   `pgvector/pgvector:pg16` image does; vanilla `postgres:16` does not).
   Embeddings are stored as portable JSON either way.
-- **Table missing for a Phase 9+ feature:** run `alembic upgrade head` — every
+- **Table missing for a feature:** run `alembic upgrade head` — every
   ORM table is created by migrations 0001/0002. The API container applies
   migrations on startup; `ensure_tables` remains only as a test/dev fallback.
 - **"Table already defined" on import:** a duplicate ORM table name — check the

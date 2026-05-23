@@ -110,7 +110,14 @@ with col_eval:
         if symbol:
             res = _get(f"/api/lifecycle/{symbol}", evaluate="true")
             if res is not None:
-                st.json(res)
+                lc = res.get("lifecycle") or {}
+                st.success(
+                    f"{symbol}: state {lc.get('current_state', '—')} "
+                    f"(was {lc.get('previous_state') or '—'}), "
+                    f"review status {lc.get('user_review_status', '—')}."
+                )
+                with st.expander("Raw diagnostics", expanded=False):
+                    st.json(res)
 
 with col_review:
     if st.button("Mark REVIEWED"):
@@ -178,4 +185,4 @@ with job_cols[1]:
                 f"Reactivated {len(res.get('reactivations', []))} symbol(s)."
             )
             if res.get("reactivations"):
-                st.json(res["reactivations"])
+                st.dataframe(res["reactivations"], use_container_width=True)

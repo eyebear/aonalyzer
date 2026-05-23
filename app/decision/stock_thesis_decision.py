@@ -73,7 +73,9 @@ def decide_stock_thesis(
     blocking = set(sufficiency.blocking_labels or [])
     if DataSufficiencyLabel.INSUFFICIENT_PRICE_HISTORY.value in blocking:
         rationale.append(
-            "Phase 19 reports insufficient price history; setup math cannot run."
+            "Not enough price history is stored for this ticker; setup math "
+            "cannot run. Refresh market data and allow more historical bars "
+            "to accumulate."
         )
         return StockThesisDecision(
             thesis_label=THESIS_INSUFFICIENT_PRICE_HISTORY,
@@ -83,14 +85,14 @@ def decide_stock_thesis(
     # --- Step 2: any other sufficiency block, or any hard-filter block ------
     if sufficiency.stock_decision_status != STOCK_DECISION_ALLOWED:
         rationale.append(
-            "Phase 19 sufficiency gate blocks stock decision: "
+            "The data sufficiency check blocks the stock decision: "
             + ", ".join(sorted(blocking))
         )
         return StockThesisDecision(thesis_label=THESIS_NO_TRADE, rationale=rationale)
 
     if hard_filter.overall_decision != HARD_FILTER_ALLOWED:
         rationale.append(
-            "Phase 20 hard filter gate blocks stock decision: "
+            "Non-negotiable risk filters block the stock decision: "
             + ", ".join(sorted(set(hard_filter.stock_blocking_labels)))
         )
         return StockThesisDecision(thesis_label=THESIS_NO_TRADE, rationale=rationale)
@@ -120,8 +122,8 @@ def decide_stock_thesis(
         )
 
     rationale.append(
-        "Phase 19 sufficiency allows, Phase 20 hard filters allow, "
-        "and price is inside the entry zone."
+        "The ticker has enough data for analysis, passed the risk filters, "
+        "and is trading inside the configured entry zone."
     )
     return StockThesisDecision(
         thesis_label=THESIS_READY_TO_RESEARCH,

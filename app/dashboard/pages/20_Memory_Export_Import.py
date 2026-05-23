@@ -26,8 +26,10 @@ st.subheader("Export")
 if st.button("Export memory package"):
     result = post_json("/api/export-import/export", {})
     if result is not None:
-        st.success(f"Exported to {result['result']['package_path']}")
-        st.json(result["result"]["manifest"])
+        body = result.get("result") or {}
+        st.success(f"Exported to {body.get('package_path', '(unknown path)')}")
+        with st.expander("Package manifest (raw diagnostics)", expanded=False):
+            st.json(body.get("manifest") or {})
 
 st.subheader("Validate / Import")
 package_dir = st.text_input("Package directory")
@@ -35,8 +37,16 @@ cols = st.columns(2)
 if cols[0].button("Validate package") and package_dir:
     result = post_json("/api/export-import/validate", {"package_dir": package_dir})
     if result is not None:
-        st.json(result["validation"])
+        validation = result.get("validation") or {}
+        if validation.get("is_valid", validation.get("valid")):
+            st.success("Package is valid.")
+        else:
+            st.warning("Package validation reported problems — see diagnostics.")
+        with st.expander("Raw diagnostics", expanded=False):
+            st.json(validation)
 if cols[1].button("Import package") and package_dir:
     result = post_json("/api/export-import/import", {"package_dir": package_dir})
     if result is not None:
-        st.json(result["result"])
+        st.success("Import finished.")
+        with st.expander("Raw diagnostics", expanded=False):
+            st.json(result.get("result") or {})

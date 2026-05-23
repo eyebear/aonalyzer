@@ -36,7 +36,7 @@ IV around 42.5%, delta .48, gamma .025, theta -.09, vega .31, volume 1200, OI 54
    `OPTION_DATA_NOT_AVAILABLE`. Missing fields are listed explicitly.
 3. **Analyze with AI** (optional) produces a plain-English explanation. It never
    fabricates missing numbers.
-4. **Suitability** runs only when enough fields exist (Phase 15): DTE, premium,
+4. **Suitability** runs only when enough fields exist: DTE, premium,
    spread, OI, volume, IV, breakeven, and target-vs-breakeven checks.
 
 ## Honesty rules

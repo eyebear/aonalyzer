@@ -1,4 +1,4 @@
-# Release Readiness Checklist (Phase 51)
+# Release Readiness Checklist
 
 Pass/fail gates that must be satisfied before tagging a release. Items marked
 *environment-dependent* require a Docker/Postgres host and are validated in CI

@@ -76,8 +76,9 @@ class OptionChainRefreshResult:
 
     placeholder: bool = True
     message: str = (
-        "Phase 8 option-chain collection is currently a placeholder. "
-        "Real option-chain collection requires a supported provider/API key."
+        "Automatic option-chain collection is not enabled; it requires a "
+        "supported market-data provider and API key. Paste option contract "
+        "data manually to evaluate the option side."
     )
 
     failed_reasons: dict[str, str] = field(default_factory=dict)
@@ -152,8 +153,9 @@ class OptionChainService:
             quality_events_created=0,
             placeholder=True,
             message=(
-                "Phase 8 option-chain collection is currently a placeholder. "
-                "No real option snapshots were fetched or stored."
+                "Automatic option-chain collection is not enabled; no option "
+                "snapshots were fetched or stored. Paste option contract data "
+                "manually to evaluate the option side."
             ),
         )
 

@@ -111,7 +111,8 @@ def manual_option_shortcut(
         result = post_json("/api/options/manual-input", body)
         if result is not None:
             st.success("Option text parsed and stored.")
-            st.json(result)
+            with st.expander("Parsed fields (raw diagnostics)", expanded=False):
+                st.json(result)
 
 
 __all__ = [

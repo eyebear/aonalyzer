@@ -14,7 +14,7 @@ missing required config.
 | `API_BASE_URL` | `http://localhost:8000` | FastAPI base URL (used by the dashboard) |
 | `DEFAULT_STRATEGY_PROFILE` | `Balanced Research Default` | Active profile |
 
-## Manual option behavior (Phase 47 — safe defaults)
+## Manual option behavior (safe defaults)
 
 | Variable | Default | Description |
 |----------|---------|-------------|

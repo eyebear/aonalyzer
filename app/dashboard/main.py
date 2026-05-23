@@ -50,7 +50,10 @@ with st.sidebar:
     if health is not None:
         st.success("FastAPI reachable")
         if is_advanced(view_mode):
-            st.json(health)
+            st.caption(
+                f"Environment: {health.get('environment', '—')} · "
+                f"App: {health.get('app_name', '—')}"
+            )
 
 # --- 1) Today's Research Worklist (FIRST) ----------------------------------
 
@@ -170,7 +173,8 @@ if regime is not None:
         f"(score {snapshot.get('regime_score', '—')})"
     )
     if is_advanced(view_mode):
-        st.json(regime)
+        with st.expander("Raw diagnostics", expanded=False):
+            st.json(regime)
 
 # --- 7) Recent important events --------------------------------------------
 

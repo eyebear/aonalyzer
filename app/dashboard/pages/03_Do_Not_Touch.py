@@ -111,7 +111,16 @@ with col_eval:
         if symbol_input:
             evaluation = _get(f"/api/do-not-touch/{symbol_input}", persist="false")
             if evaluation is not None:
-                st.json(evaluation)
+                rec = (evaluation.get("evaluation") or {}).get("recommendation") or {}
+                decision = rec.get("decision") or "UNKNOWN"
+                if decision == "NO_FREEZE":
+                    st.success(rec.get("reason_summary") or "No freeze condition found.")
+                else:
+                    st.warning(
+                        f"{decision}: {rec.get('reason_summary') or 'see diagnostics.'}"
+                    )
+                with st.expander("Raw diagnostics", expanded=False):
+                    st.json(evaluation)
     # Phase 32.6 — re-check: re-evaluate and apply (a freeze whose conditions
     # no longer hold is released).
     if st.button("Re-check (re-evaluate & apply)"):
@@ -138,7 +147,8 @@ with col_freeze:
             )
             if res is not None:
                 st.success(f"Frozen {symbol_input}.")
-                st.json(res)
+                with st.expander("Raw diagnostics", expanded=False):
+                    st.json(res)
 
 with col_release:
     release_reason = st.text_input(
@@ -152,7 +162,8 @@ with col_release:
             )
             if res is not None:
                 st.success(f"Released {symbol_input}.")
-                st.json(res)
+                with st.expander("Raw diagnostics", expanded=False):
+                    st.json(res)
 
 # --- History --------------------------------------------------------------
 
