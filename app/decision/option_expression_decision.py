@@ -18,9 +18,9 @@ from app.decision.decision_labels import (
     OPTION_EXPR_OK,
 )
 from app.hard_filter.hard_filter_gate import (
-    HardFilterDecision,
     OPTION_DECISION_ALLOWED,
     OPTION_DECISION_BLOCKED,
+    HardFilterDecision,
 )
 
 

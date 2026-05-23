@@ -32,7 +32,6 @@ from app.earnings.earnings_models import EarningsRiskSnapshot
 from app.iv_history.iv_models import IvRiskSnapshot
 from app.lifecycle.lifecycle_models import OpportunityLifecycle
 from app.lifecycle.lifecycle_states import (
-    STATE_INSUFFICIENT_DATA,
     STATE_READY_FOR_RESEARCH,
     STATE_WAIT_FOR_MANUAL_OPTION_INPUT,
     STATE_WAITING_FOR_ENTRY,
@@ -50,7 +49,6 @@ from app.review.evaluators import (
 )
 from app.review.next_review_trigger_engine import NextReviewTriggerEngine
 from app.review.review_models import ReviewQueueItem, ReviewTrigger
-from app.review.review_queue_generator import ReviewQueueGenerator
 from app.review.review_service import ReviewService
 from app.review.review_trigger_types import (
     QUEUE_STATUS_DISMISSED,
@@ -65,7 +63,6 @@ from app.review.review_trigger_types import (
     TRIGGER_RECHECK_AFTER_MANUAL_OPTION_INPUT,
 )
 from app.review.scheduled_review_trigger_job import ScheduledReviewTriggerJob
-
 
 # ---------------------------------------------------------------------------
 # Pure evaluator unit tests
@@ -481,7 +478,7 @@ def test_arm_for_symbol_arms_price_trigger_when_waiting_for_entry() -> None:
 
     session = _TestSession()
     try:
-        result = NextReviewTriggerEngine().arm_for_symbol(session, "AMD")
+        NextReviewTriggerEngine().arm_for_symbol(session, "AMD")
         types = {
             t.trigger_type
             for t in session.query(ReviewTrigger)
@@ -528,7 +525,7 @@ def test_arm_for_symbol_disarms_when_lifecycle_moves() -> None:
         row = session.query(OpportunityLifecycle).first()
         row.current_state = STATE_READY_FOR_RESEARCH
         session.commit()
-        result = engine.arm_for_symbol(session, "AMD")
+        engine.arm_for_symbol(session, "AMD")
         active_types = {
             t.trigger_type
             for t in session.query(ReviewTrigger)

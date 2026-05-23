@@ -112,6 +112,19 @@ with col_eval:
             evaluation = _get(f"/api/do-not-touch/{symbol_input}", persist="false")
             if evaluation is not None:
                 st.json(evaluation)
+    # Phase 32.6 — re-check: re-evaluate and apply (a freeze whose conditions
+    # no longer hold is released).
+    if st.button("Re-check (re-evaluate & apply)"):
+        if symbol_input:
+            evaluation = _get(f"/api/do-not-touch/{symbol_input}", persist="true")
+            if evaluation is not None:
+                active = evaluation.get("active_freeze")
+                if active:
+                    st.warning(
+                        f"{symbol_input} remains frozen: {active['reason_summary']}"
+                    )
+                else:
+                    st.success(f"{symbol_input} is not frozen after re-check.")
 
 with col_freeze:
     freeze_reason = st.text_input(
@@ -164,3 +177,27 @@ if symbol_input:
         )
     else:
         st.info(f"No history for {symbol_input}.")
+
+# --- Memory: did similar freezes work? (Phase 32.8) ------------------------
+
+st.subheader("Similar freeze memory")
+if symbol_input:
+    # Case memory (Phase 41) records whether past freezes avoided bad outcomes.
+    cases = _get("/api/memory/cases", symbol=symbol_input, case_type="DO_NOT_TOUCH")
+    if cases is not None and cases.get("cases"):
+        st.dataframe(
+            [
+                {
+                    "Outcome": c.get("outcome_type"),
+                    "Lesson": c.get("lesson_summary"),
+                    "Created": c.get("created_at"),
+                }
+                for c in cases["cases"]
+            ],
+            use_container_width=True,
+        )
+    else:
+        st.caption(
+            "No similar freeze outcomes stored yet. Freeze quality is learned "
+            "as Do-Not-Touch outcomes are tracked over time."
+        )

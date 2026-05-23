@@ -16,8 +16,10 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from app.data_quality.data_sufficiency_gate import (
-    GateDecision as SufficiencyDecision,
     STOCK_DECISION_ALLOWED,
+)
+from app.data_quality.data_sufficiency_gate import (
+    GateDecision as SufficiencyDecision,
 )
 from app.data_quality.data_sufficiency_labels import DataSufficiencyLabel
 from app.decision.decision_labels import (
@@ -29,6 +31,8 @@ from app.decision.decision_labels import (
 )
 from app.hard_filter.hard_filter_gate import (
     DECISION_ALLOWED as HARD_FILTER_ALLOWED,
+)
+from app.hard_filter.hard_filter_gate import (
     HardFilterDecision,
 )
 

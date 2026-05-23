@@ -27,7 +27,7 @@ from app.decision.decision_labels import (
 )
 from app.decision.event_risk_decision import EventRiskDecision
 from app.decision.memory_risk_decision import MemoryRiskDecision
-from app.hard_filter.hard_filter_gate import HardFilterDecision, REGIME_OPPOSES_SETUP
+from app.hard_filter.hard_filter_gate import REGIME_OPPOSES_SETUP, HardFilterDecision
 
 
 @dataclass(frozen=True)

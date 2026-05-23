@@ -1,0 +1,137 @@
+name: CI
+
+# Phase 50 — quality gates on push and pull request.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  # 50.3 / 50.4 — lint + formatting.
+  lint:
+    name: Lint & format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install ruff
+        run: pip install ruff==0.8.4
+      - name: Ruff lint (blocking)
+        run: ruff check .
+      - name: Ruff format check (advisory — legacy files predate ruff-format)
+        run: ruff format --check . || true
+
+  # 50.2 / 50.5 / 50.11 / 50.12 — deps + pytest with Postgres & Redis services.
+  test:
+    name: Tests (pytest + migrations)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: aonalyzer
+          POSTGRES_PASSWORD: aonalyzer_password
+          POSTGRES_DB: aonalyzer
+        ports: ["5434:5432"]
+        options: >-
+          --health-cmd "pg_isready -U aonalyzer"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql+psycopg://aonalyzer:aonalyzer_password@localhost:5434/aonalyzer
+      REDIS_URL: redis://localhost:6379/0
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Validate environment (50.21)
+        run: python scripts/validate_env.py
+      - name: Alembic migration check (50.11)
+        run: alembic upgrade head
+      - name: Run pytest
+        run: pytest -q --junitxml=pytest-report.xml
+      - name: Upload test report on failure (50.18)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pytest-report
+          path: pytest-report.xml
+
+  # 50.6-50.10 / 50.16 — critical-contract test suites.
+  contracts:
+    name: Critical contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Decision-engine + action tests (50.7)
+        run: pytest -q tests/test_decision_intelligence.py tests/test_action_suggestion_layer.py
+      - name: Manual option parser tests (50.8)
+        run: pytest -q tests/test_manual_option_parser.py tests/test_manual_option_input_service.py
+      - name: Stock-only fallback + cross-layer invariants (50.9)
+        run: pytest -q tests/test_phase19_26_cross_layer_invariants.py tests/test_ticker_analyzer_flow.py
+      - name: AI safety / schema tests (50.10)
+        run: pytest -q tests/test_chat_service.py tests/test_ai_analysis_core.py
+      - name: API contract tests (50.6)
+        run: pytest -q tests/test_api_foundation.py tests/test_health.py
+      - name: Export/import integrity (50.16)
+        run: pytest -q tests/test_governance_settings_pipeline.py
+
+  # 50.13 / 50.14 / 50.15 — Docker build + compose smoke + dashboard startup.
+  docker:
+    name: Docker build & compose smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build API image (50.13)
+        run: docker build -f Dockerfile.api -t aonalyzer-api:ci .
+      - name: Build dashboard image (50.13)
+        run: docker build -f Dockerfile.dashboard -t aonalyzer-dashboard:ci .
+      - name: Validate compose config (50.14)
+        run: docker compose config
+      - name: Dashboard import check (50.15)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          python -c "import ast, pathlib; [ast.parse(p.read_text()) for p in pathlib.Path('app/dashboard').rglob('*.py')]"
+
+  # 50.17 — best-effort dependency audit (non-blocking).
+  dependency-audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: pip-audit
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt || true

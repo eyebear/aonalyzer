@@ -47,7 +47,6 @@ from app.risk_control.do_not_touch_categories import (
     TRIGGER_AUTOMATIC,
 )
 
-
 DECISION_FREEZE = "FREEZE"
 DECISION_NO_FREEZE = "NO_FREEZE"
 

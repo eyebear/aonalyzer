@@ -19,7 +19,6 @@ from sqlalchemy.orm import Session
 
 from app.data_quality.data_sufficiency_gate import GateDecision as SufficiencyDecision
 from app.decision.action_label_classifier import (
-    ActionLabel,
     classify_action_label,
 )
 from app.decision.confidence_score_engine import (

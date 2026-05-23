@@ -27,7 +27,6 @@ from app.lifecycle.lifecycle_states import (
     normalize_phase22_state,
 )
 
-
 # --- Transition kinds (used by the reason builder) -------------------------
 
 KIND_NO_CHANGE = "NO_CHANGE"

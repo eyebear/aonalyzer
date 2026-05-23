@@ -41,13 +41,19 @@ def get_db() -> Session:
         db.close()
 
 
-def ensure_data_quality_tables() -> None:
-    Base.metadata.create_all(bind=engine)
+def ensure_data_quality_tables(db: Session | None = None) -> None:
+    # Bind to the active session's engine when available so the call honors
+    # dependency-overridden sessions (tests, alternate engines); fall back to
+    # the module-level engine only when no session is supplied. For a real
+    # Postgres deployment the bound engine *is* the module engine, so behavior
+    # is unchanged. Mirrors the project-wide ``ensure_tables(db)`` convention.
+    bind = db.get_bind() if db is not None else engine
+    Base.metadata.create_all(bind=bind)
 
 
 @router.get("/status")
 def get_data_quality_status(db: Session = Depends(get_db)) -> dict[str, Any]:
-    ensure_data_quality_tables()
+    ensure_data_quality_tables(db)
 
     freshness_checker = DataFreshnessChecker()
     now = datetime.now(timezone.utc)
@@ -114,7 +120,7 @@ def get_data_quality_status(db: Session = Depends(get_db)) -> dict[str, Any]:
 
 @router.get("/insufficient-events")
 def get_insufficient_data_events(db: Session = Depends(get_db)) -> dict[str, Any]:
-    ensure_data_quality_tables()
+    ensure_data_quality_tables(db)
 
     events = (
         db.query(InsufficientDataEvent)
@@ -148,7 +154,7 @@ def get_insufficient_data_events(db: Session = Depends(get_db)) -> dict[str, Any
 
 @router.post("/check/sample")
 def run_sample_data_quality_check(db: Session = Depends(get_db)) -> dict[str, Any]:
-    ensure_data_quality_tables()
+    ensure_data_quality_tables(db)
 
     checker = DataQualityChecker()
 
@@ -201,7 +207,7 @@ def get_data_sufficiency(
     analysis, which block option suitability only, and which are warnings
     or confidence reducers.
     """
-    ensure_data_quality_tables()
+    ensure_data_quality_tables(db)
 
     clean_symbol = (symbol or "").strip().upper()
     if not clean_symbol:

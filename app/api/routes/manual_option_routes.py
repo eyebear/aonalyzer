@@ -54,28 +54,10 @@ def create_manual_option_input(
     )
 
 
-@router.post(
-    "/api/tickers/{symbol}/options/manual-input",
-    response_model=ManualOptionSnapshotResponse,
-)
-def create_ticker_manual_option_input(
-    symbol: str,
-    request: ManualOptionInputRequest,
-    session: Session = Depends(get_db_session),
-) -> ManualOptionSnapshotResponse:
-    service = ManualOptionInputService()
-
-    snapshot = service.create_manual_snapshot(
-        db=session,
-        raw_text=request.raw_text,
-        symbol=symbol,
-        source_name=request.source_name,
-    )
-
-    return ManualOptionSnapshotResponse(
-        status="OK",
-        snapshot=snapshot.to_dict(),
-    )
+# Note: ``POST /api/tickers/{symbol}/options/manual-input`` is owned by
+# ``ticker_routes`` (registered first); the previously duplicated handler here
+# was unreachable dead code and has been removed. The non-ticker
+# ``POST /api/options/manual-input`` above remains the canonical entry point.
 
 
 @router.get(

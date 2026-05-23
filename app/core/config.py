@@ -144,6 +144,14 @@ class AppSettings(BaseSettings):
     # earnings it is a hard fail. Profiles cannot bypass this.
     hard_filter_earnings_inside_window_blocks: bool = False
 
+    # --- Phase 47: Settings (manual option behavior) ---
+    # Safe defaults: missing option data must never block stock-only research,
+    # so ``allow_stock_only_when_options_missing`` stays True by default.
+    manual_option_input_enabled: bool = True
+    option_text_ai_reader_enabled: bool = True
+    strict_option_parser_mode: bool = False
+    allow_stock_only_when_options_missing: bool = True
+
     exports_dir: str = "exports"
     models_dir: str = "models"
     reports_dir: str = "reports"

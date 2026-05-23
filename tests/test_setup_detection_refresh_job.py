@@ -58,7 +58,9 @@ def test_refresh_job_records_success_and_agent_run() -> None:
     db.commit()
 
     service = SetupDetectionService(settings=AppSettings())
-    response = run_setup_detection_refresh_job(db=db, symbols=["AMD"], setup_detection_service=service)
+    response = run_setup_detection_refresh_job(
+        db=db, symbols=["AMD"], setup_detection_service=service
+    )
 
     assert response["status"] == "SUCCESS"
     assert response["job_name"] == "setup_detection_refresh"

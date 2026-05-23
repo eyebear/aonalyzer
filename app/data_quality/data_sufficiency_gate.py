@@ -40,7 +40,6 @@ from app.data_quality.data_quality_checker import (
     DataQualityResult,
 )
 from app.data_quality.data_sufficiency_labels import (
-    DataQualitySeverity,
     DataSufficiencyLabel,
 )
 from app.data_quality.insufficient_data_action_builder import (

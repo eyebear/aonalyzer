@@ -37,7 +37,6 @@ from app.database.base import Base
 from app.database.connection import get_db_session
 from app.database.models import DailyPrice
 from app.earnings.earnings_models import EarningsRiskSnapshot
-from app.lifecycle.lifecycle_history_writer import LifecycleHistoryWriter
 from app.lifecycle.lifecycle_memory_bridge import (
     LifecycleLesson,
     LifecycleMemoryBridge,
@@ -49,15 +48,14 @@ from app.lifecycle.lifecycle_models import (
 from app.lifecycle.lifecycle_service import LifecycleService
 from app.lifecycle.lifecycle_states import (
     PHASE22_TO_PHASE25,
-    REVIEW_DISMISSED,
     REVIEW_REVIEWED,
     REVIEW_UNREVIEWED,
+    SOURCE_PHASE_PHASE22,
     STATE_INSUFFICIENT_DATA,
     STATE_READY_FOR_RESEARCH,
     STATE_REJECTED,
     STATE_WAIT_FOR_MANUAL_OPTION_INPUT,
     STATE_WATCHING,
-    SOURCE_PHASE_PHASE22,
     TRIGGER_SYSTEM_EVALUATION,
     normalize_phase22_state,
 )
@@ -80,7 +78,6 @@ from app.lifecycle.state_transition_engine import (
 from app.lifecycle.user_review_state_tracker import UserReviewStateTracker
 from app.market_regime.market_regime_models import MarketRegimeSnapshot
 from app.quant.stock_setup_models import StockSetup
-
 
 # ---------------------------------------------------------------------------
 # State-machine unit tests (pure logic)

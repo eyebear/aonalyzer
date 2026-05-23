@@ -60,9 +60,7 @@ def test_no_option_data_returns_not_available() -> None:
 
 
 def test_no_option_data_but_requested_needs_input() -> None:
-    result = evaluate_option_suitability(
-        OptionFields(), THRESHOLDS, option_input_requested=True
-    )
+    result = evaluate_option_suitability(OptionFields(), THRESHOLDS, option_input_requested=True)
     assert result.suitability_label == MANUAL_OPTION_INPUT_NEEDED
 
 
@@ -97,14 +95,18 @@ def test_dte_too_short() -> None:
 
 def test_spread_too_wide() -> None:
     result = evaluate_option_suitability(
-        _good_call(bid=4.0, ask=6.0), THRESHOLDS, StockContext(target_price=120.0, underlying_price=100.0)
+        _good_call(bid=4.0, ask=6.0),
+        THRESHOLDS,
+        StockContext(target_price=120.0, underlying_price=100.0),
     )
     assert SPREAD_TOO_WIDE in result.rejection_labels
 
 
 def test_low_open_interest() -> None:
     result = evaluate_option_suitability(
-        _good_call(open_interest=50), THRESHOLDS, StockContext(target_price=120.0, underlying_price=100.0)
+        _good_call(open_interest=50),
+        THRESHOLDS,
+        StockContext(target_price=120.0, underlying_price=100.0),
     )
     assert LOW_OPEN_INTEREST in result.rejection_labels
 

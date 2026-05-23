@@ -6,10 +6,29 @@ Aonalyzer is a local equity and options research platform for structured market 
 
 Aonalyzer is built in sequential, independently testable phases.
 
-- **Completed: Phases 0–26.** Phases 0–18 cover the project and local runtime foundation, centralized configuration and strategy profiles, the database and FastAPI foundations, the agent scheduler and refresh framework, data-quality and data-sufficiency tracking, market data collection, manual option handling, news/filings/macro/event normalization, the earnings calendar and optional IV history, the technical-analysis engine, support/resistance/entry/target/stop math, market regime and sector strength, stock setup detection, the optional option-suitability engine, the pretrained-model layer foundation, the AI provider manager, and AI-assisted event and manual-option-text analysis. Phase 19 added the data sufficiency gate that separates blocking stock-data issues from non-blocking option, news, IV, earnings, and memory warnings. Phase 20 added the hard filter gate that enforces non-negotiable stock rules (risk/reward, price extension, market regime, earnings risk) and optional option rules (DTE, target-vs-breakeven, spread, open interest, IV extreme). Phase 21 added the decision intelligence layer that combines the sufficiency and hard-filter outputs with event-risk and memory-risk into a final action label, priority score, confidence score, and decision trace. Phase 22 added the action suggestion layer that turns each final decision into a structured action package with entry condition, invalidation condition, upgrade/downgrade conditions, watch condition, next-review trigger guidance, and concrete action items. Phase 23 added rejection intelligence with a dedicated rejected-candidates and rejection-reasons store, per-cause explainers, and a "rejected but interesting" bucket. Phase 24 added Do-Not-Touch risk control with active freezes, an audit-trail history, release condition builder, and expiration monitor. Phase 25 added persistent opportunity lifecycle tracking across READY/WATCH/WAIT/WAIT_FOR_MANUAL_OPTION_INPUT/REJECTED/INSUFFICIENT_DATA states, with reactivation detection and user-review tracking. Phase 26 added the next-review trigger engine and review queue that arm per-symbol trigger conditions from the current lifecycle state and surface due reviews when those conditions fire.
-- **Next planned: Phase 27.**
+- **Completed: Phases 0–52.** Phases 0–26 established the foundation, configuration and profiles, database and FastAPI, the agent scheduler and refresh framework, data-quality and data-sufficiency tracking, market/option/news/filings/macro/earnings/IV collection, the technical-analysis engine, support/resistance/entry/target/stop math, market regime and sector strength, stock setup detection, the optional option-suitability engine, the pretrained-model layer, the AI provider manager, AI-assisted event and manual-option-text analysis, the data-sufficiency gate, the hard-filter gate, the decision intelligence layer, the action suggestion layer, rejection intelligence, Do-Not-Touch risk control, persistent opportunity lifecycle tracking, and the next-review trigger engine + review queue.
+- **Phases 27–52 (this milestone):** Today's Research Worklist (with the `PASTE_OPTION_DATA` item), the One-Page Ticker Brief, the progressive-disclosure dashboard (Home command center + beginner/advanced view), the Daily Opportunities / Rejected-But-Interesting / Do-Not-Touch / Ticker Analyzer / Manual Option Review / Earnings-IV Risk / News-Events pages, the AI Research Chat with seven answer modes, user-action & override tracking, signal-outcome tracking (5/10/20/30-day returns), rejection & Do-Not-Touch outcome tracking, case memory, vector memory (pgvector-ready, portable cosine fallback), skill memory & performance, weekly learning reports, the approval-gated improvement engine + champion/challenger, versioning & governance (eight version keys per decision + audit metadata), the Settings page, memory export/import (package + CLI), the end-to-end orchestration pipeline, the CI/CD workflows + quality gates, and the documentation set in `docs/`.
 
-The platform is stock-first and non-blocking by design: option data is always optional, and missing or incomplete option data never blocks stock-only analysis. The system never invents missing option values. Missing option data is also never a rejection, never a Do-Not-Touch freeze, and never an automatic review queue entry on its own. AI providers and pretrained models are disabled by default; the system runs fully in a deterministic fallback mode and degrades gracefully when they are unavailable.
+The platform is stock-first and non-blocking by design: option data is always optional, and missing or incomplete option data never blocks stock-only analysis. The system never invents missing option values. Missing option data is also never a rejection, never a Do-Not-Touch freeze, and never an automatic review-queue entry on its own; outcome trackers record an absent option outcome as *unavailable* rather than zero or failed. The AI Research Chat uses only system context, states when option data is missing, and never overrides hard filters. Vector memory and improvement suggestions are supporting/advisory only and never change deterministic gates or production rules without explicit approval. The setting `allow_stock_only_when_options_missing` defaults to `true`. AI providers and pretrained models are disabled by default; the system runs fully in a deterministic fallback mode and degrades gracefully when they are unavailable.
+
+## Documentation
+
+See the [`docs/`](docs) directory:
+
+- [Operating manual](docs/operating-manual.md) — daily workflow
+- [Decision flow](docs/decision-flow.md) — stock-only vs option-aware paths
+- [Action label guide](docs/action-label-guide.md)
+- [Manual option input guide](docs/manual-option-input-guide.md)
+- [Refresh schedule guide](docs/refresh-schedule-guide.md)
+- [AI provider guide](docs/ai-provider-guide.md)
+- [Memory & experience guide](docs/memory-experience-guide.md)
+- [Memory export/import guide](docs/export-import-guide.md)
+- [Environment variable guide](docs/environment-variables.md)
+- [CI/CD guide](docs/ci-cd-guide.md)
+- [VPS deployment guide](docs/vps-deployment-guide.md)
+- [Troubleshooting guide](docs/troubleshooting.md)
+- [Release checklist](docs/release-checklist.md)
+- [Architecture diagram](docs/architecture-diagram.md)
 
 ## Project Identity
 

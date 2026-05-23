@@ -17,7 +17,6 @@ from typing import Any
 
 from app.data_quality.data_sufficiency_labels import DataSufficiencyLabel
 
-
 # --- Action category constants ----------------------------------------------
 
 ACTION_REFRESH_MARKET_DATA = "REFRESH_MARKET_DATA"

@@ -26,11 +26,8 @@ from app.data_quality.data_sufficiency_gate import (
 from app.database.base import Base
 from app.database.connection import get_db_session
 from app.database.models import DailyPrice
-from app.decision.action_label_classifier import classify_action_label
 from app.decision.decision_labels import (
     CHECK_FAIL,
-    CHECK_PASS,
-    CHECK_WARNING,
     INSUFFICIENT_PRICE_HISTORY,
     NO_TRADE,
     OPTION_DATA_NOT_AVAILABLE,
@@ -66,7 +63,6 @@ from app.decision.memory_risk_decision import MemoryRiskInputs, decide_memory_ri
 from app.decision.option_expression_decision import decide_option_expression
 from app.decision.stock_thesis_decision import (
     StockThesisInputs,
-    decide_stock_thesis,
 )
 from app.decision.version_stamp_builder import (
     DEFAULT_DECISION_ENGINE_VERSION,
@@ -84,7 +80,6 @@ from app.hard_filter.hard_filter_gate import (
 from app.market_regime.market_regime_models import MarketRegimeSnapshot
 from app.profiles.default_profiles import get_balanced_research_default
 from app.quant.stock_setup_models import StockSetup
-
 
 # ---------------------------------------------------------------------------
 # Helpers — build (sufficiency, hard_filter) pairs for each scenario
@@ -594,7 +589,7 @@ def reset_db():
 def _seed_prices(symbol: str, n: int) -> None:
     session = _TestSession()
     try:
-        for i, row in enumerate(_price_rows(n)):
+        for _i, row in enumerate(_price_rows(n)):
             session.add(
                 DailyPrice(
                     symbol=symbol,

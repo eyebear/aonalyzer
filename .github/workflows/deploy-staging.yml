@@ -1,0 +1,29 @@
+name: Deploy (staging)
+
+# Phase 50.19 — staging deployment placeholder. Runs only when manually
+# dispatched; does not force a production release. Wire real steps once the
+# staging host + secrets are configured.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to deploy"
+        required: false
+        default: "main"
+
+jobs:
+  staging:
+    name: Deploy to staging
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - name: Validate required secrets are present
+        run: |
+          if [ -z "${{ secrets.STAGING_HOST }}" ]; then
+            echo "STAGING_HOST secret not set; skipping deploy (placeholder)."
+            exit 0
+          fi
+          echo "Staging deploy would run here."

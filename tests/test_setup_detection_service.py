@@ -28,9 +28,21 @@ def create_test_session():
     return engine, SessionLocal()
 
 
-def _seed_technical(db, symbol, *, last_close, sma_20, sma_50, sma_200=None,
-                    rsi_14=None, atr_14=None, volume_ratio_20=None,
-                    macd_histogram=None, bollinger_lower=None, snapshot_date=D) -> None:
+def _seed_technical(
+    db,
+    symbol,
+    *,
+    last_close,
+    sma_20,
+    sma_50,
+    sma_200=None,
+    rsi_14=None,
+    atr_14=None,
+    volume_ratio_20=None,
+    macd_histogram=None,
+    bollinger_lower=None,
+    snapshot_date=D,
+) -> None:
     db.add(
         TechnicalSnapshot(
             symbol=symbol.upper(),
@@ -53,8 +65,18 @@ def _seed_technical(db, symbol, *, last_close, sma_20, sma_50, sma_200=None,
     db.commit()
 
 
-def _seed_setup(db, symbol, *, current_close, nearest_support=None, nearest_resistance=None,
-                stock_risk_reward=None, target_price=None, stop_price=None, snapshot_date=D) -> None:
+def _seed_setup(
+    db,
+    symbol,
+    *,
+    current_close,
+    nearest_support=None,
+    nearest_resistance=None,
+    stock_risk_reward=None,
+    target_price=None,
+    stop_price=None,
+    snapshot_date=D,
+) -> None:
     db.add(
         StockSetup(
             symbol=symbol.upper(),
@@ -81,10 +103,26 @@ def _seed_regime(db, label="RISK_ON", snapshot_date=D) -> None:
 
 def test_detect_pullback_long_persists_signal() -> None:
     _, db = create_test_session()
-    _seed_technical(db, "AMD", last_close=104.0, sma_20=105.0, sma_50=100.0,
-                    sma_200=90.0, rsi_14=45.0, atr_14=4.0, volume_ratio_20=1.5)
-    _seed_setup(db, "AMD", current_close=104.0, nearest_resistance=None,
-                stock_risk_reward=3.0, target_price=120.0, stop_price=98.0)
+    _seed_technical(
+        db,
+        "AMD",
+        last_close=104.0,
+        sma_20=105.0,
+        sma_50=100.0,
+        sma_200=90.0,
+        rsi_14=45.0,
+        atr_14=4.0,
+        volume_ratio_20=1.5,
+    )
+    _seed_setup(
+        db,
+        "AMD",
+        current_close=104.0,
+        nearest_resistance=None,
+        stock_risk_reward=3.0,
+        target_price=120.0,
+        stop_price=98.0,
+    )
     _seed_regime(db, "RISK_ON")
 
     service = SetupDetectionService(settings=AppSettings())
@@ -107,8 +145,16 @@ def test_detect_pullback_long_persists_signal() -> None:
 def test_partial_when_setup_math_missing() -> None:
     _, db = create_test_session()
     # Technical present (pullback shape), but no Phase 12 StockSetup row.
-    _seed_technical(db, "AMD", last_close=104.0, sma_20=105.0, sma_50=100.0,
-                    sma_200=90.0, rsi_14=45.0, atr_14=4.0)
+    _seed_technical(
+        db,
+        "AMD",
+        last_close=104.0,
+        sma_20=105.0,
+        sma_50=100.0,
+        sma_200=90.0,
+        rsi_14=45.0,
+        atr_14=4.0,
+    )
     _seed_regime(db, "RISK_ON")
 
     service = SetupDetectionService(settings=AppSettings())
@@ -135,8 +181,16 @@ def test_insufficient_when_no_technical() -> None:
 def test_sector_strength_long_with_sector_map() -> None:
     _, db = create_test_session()
     # Uptrend but neither pullback (rsi 60) nor breakout (no resistance).
-    _seed_technical(db, "NVDA", last_close=120.0, sma_20=105.0, sma_50=100.0,
-                    sma_200=90.0, rsi_14=60.0, atr_14=4.0)
+    _seed_technical(
+        db,
+        "NVDA",
+        last_close=120.0,
+        sma_20=105.0,
+        sma_50=100.0,
+        sma_200=90.0,
+        rsi_14=60.0,
+        atr_14=4.0,
+    )
     _seed_setup(db, "NVDA", current_close=120.0, nearest_resistance=None)
     _seed_regime(db, "RISK_ON")
     db.add(
@@ -165,8 +219,16 @@ def test_sector_strength_long_with_sector_map() -> None:
 
 def test_refresh_is_idempotent_per_symbol_date() -> None:
     _, db = create_test_session()
-    _seed_technical(db, "AMD", last_close=104.0, sma_20=105.0, sma_50=100.0,
-                    sma_200=90.0, rsi_14=45.0, atr_14=4.0)
+    _seed_technical(
+        db,
+        "AMD",
+        last_close=104.0,
+        sma_20=105.0,
+        sma_50=100.0,
+        sma_200=90.0,
+        rsi_14=45.0,
+        atr_14=4.0,
+    )
     _seed_setup(db, "AMD", current_close=104.0, stock_risk_reward=3.0)
     _seed_regime(db, "RISK_ON")
 
@@ -186,8 +248,16 @@ def test_does_not_require_option_data() -> None:
 
     assert "manual_option_snapshots" not in set(inspect(db.get_bind()).get_table_names())
 
-    _seed_technical(db, "AMD", last_close=104.0, sma_20=105.0, sma_50=100.0,
-                    sma_200=90.0, rsi_14=45.0, atr_14=4.0)
+    _seed_technical(
+        db,
+        "AMD",
+        last_close=104.0,
+        sma_20=105.0,
+        sma_50=100.0,
+        sma_200=90.0,
+        rsi_14=45.0,
+        atr_14=4.0,
+    )
     _seed_setup(db, "AMD", current_close=104.0, stock_risk_reward=3.0)
 
     service = SetupDetectionService(settings=AppSettings())

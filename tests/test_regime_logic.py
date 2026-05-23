@@ -59,20 +59,26 @@ def test_classify_vix_bands() -> None:
 
 def test_classify_yield_rising_triggers_pressure() -> None:
     # +25% over a 2-day lookback (4.0 -> 5.0); rise_pct=0.10
-    result = classify_yield_pressure([4.0, 4.5, 5.0], lookback_days=2, pressure_level=99.0, rise_pct=0.10)
+    result = classify_yield_pressure(
+        [4.0, 4.5, 5.0], lookback_days=2, pressure_level=99.0, rise_pct=0.10
+    )
     assert result.state == YIELD_RISING
     assert result.pressure is True
     assert result.level == 5.0
 
 
 def test_classify_yield_level_triggers_pressure_even_if_stable() -> None:
-    result = classify_yield_pressure([4.6, 4.6, 4.6], lookback_days=2, pressure_level=4.5, rise_pct=0.10)
+    result = classify_yield_pressure(
+        [4.6, 4.6, 4.6], lookback_days=2, pressure_level=4.5, rise_pct=0.10
+    )
     assert result.state == YIELD_STABLE
     assert result.pressure is True  # level >= pressure_level
 
 
 def test_classify_yield_falling_no_pressure() -> None:
-    result = classify_yield_pressure([5.0, 4.5, 4.0], lookback_days=2, pressure_level=4.5, rise_pct=0.10)
+    result = classify_yield_pressure(
+        [5.0, 4.5, 4.0], lookback_days=2, pressure_level=4.5, rise_pct=0.10
+    )
     assert result.state == YIELD_FALLING
     assert result.pressure is False
 

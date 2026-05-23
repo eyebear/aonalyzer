@@ -30,13 +30,13 @@ from sqlalchemy.pool import StaticPool
 from app.api.main import app
 from app.api.routes import data_quality_routes
 from app.data_quality.data_sufficiency_gate import (
-    DataSufficiencyGate,
-    GateDecision,
     INSUFFICIENT_OPTION_DATA,
     OPTION_DATA_NOT_AVAILABLE,
     OPTION_OK,
     STOCK_DECISION_ALLOWED,
     STOCK_DECISION_BLOCKED,
+    DataSufficiencyGate,
+    GateDecision,
     SufficiencyInputs,
 )
 from app.data_quality.data_sufficiency_labels import DataSufficiencyLabel
@@ -56,7 +56,6 @@ from app.earnings.earnings_models import EarningsEvent
 from app.iv_history.iv_models import IvHistoryDay
 from app.profiles.default_profiles import get_balanced_research_default
 from app.quant.stock_setup_models import StockSetup
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -130,11 +129,14 @@ def test_missing_options_do_not_block_stock_only_decision() -> None:
             option_rows=None,
             news_rows=_news_rows(3),
             iv_history_rows=[
-                {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5}
-                for _ in range(40)
+                {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5} for _ in range(40)
             ],
             earnings_rows=[
-                {"symbol": "AMD", "earnings_datetime_utc": datetime(2026, 7, 1, tzinfo=timezone.utc), "source": "test"}
+                {
+                    "symbol": "AMD",
+                    "earnings_datetime_utc": datetime(2026, 7, 1, tzinfo=timezone.utc),
+                    "source": "test",
+                }
             ],
             memory_rows=[{"id": 1}],
         ),
@@ -158,8 +160,7 @@ def test_missing_price_history_blocks_stock_decision() -> None:
             option_rows=_ok_option_rows(),
             news_rows=_news_rows(3),
             iv_history_rows=[
-                {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5}
-                for _ in range(40)
+                {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5} for _ in range(40)
             ],
             earnings_rows=[{"symbol": "AMD"}],
             memory_rows=[{"id": 1}],
@@ -181,8 +182,7 @@ def test_legacy_insufficient_setup_data_maps_to_phase19_blocking_label() -> None
             option_rows=None,
             news_rows=_news_rows(3),
             iv_history_rows=[
-                {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5}
-                for _ in range(40)
+                {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5} for _ in range(40)
             ],
             earnings_rows=[{"symbol": "AMD"}],
             memory_rows=[{"id": 1}],
@@ -190,15 +190,9 @@ def test_legacy_insufficient_setup_data_maps_to_phase19_blocking_label() -> None
     )
 
     assert decision.stock_decision_status == STOCK_DECISION_BLOCKED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_STOCK_SETUP_DATA.value
-        in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_STOCK_SETUP_DATA.value in decision.blocking_labels
     # The legacy label must NOT leak into the gate's public output.
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_SETUP_DATA.value
-        not in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_SETUP_DATA.value not in decision.blocking_labels
 
 
 def test_phase19_setup_label_passes_through() -> None:
@@ -212,10 +206,7 @@ def test_phase19_setup_label_passes_through() -> None:
         ),
     )
     assert decision.stock_decision_status == STOCK_DECISION_BLOCKED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_STOCK_SETUP_DATA.value
-        in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_STOCK_SETUP_DATA.value in decision.blocking_labels
 
 
 def test_sufficient_setup_status_does_not_block() -> None:
@@ -245,20 +236,12 @@ def test_missing_news_is_non_blocking_by_default() -> None:
     )
 
     assert decision.stock_decision_status == STOCK_DECISION_ALLOWED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_NEWS_DATA.value
-        in decision.non_blocking_labels
-    )
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_NEWS_DATA.value
-        not in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_NEWS_DATA.value in decision.non_blocking_labels
+    assert DataSufficiencyLabel.INSUFFICIENT_NEWS_DATA.value not in decision.blocking_labels
 
 
 def test_profile_required_news_promotes_to_blocking() -> None:
-    profile = get_balanced_research_default().model_copy(
-        update={"requires_news_data": True}
-    )
+    profile = get_balanced_research_default().model_copy(update={"requires_news_data": True})
     gate = DataSufficiencyGate()
     decision = gate.evaluate_inputs(
         SufficiencyInputs(
@@ -272,9 +255,7 @@ def test_profile_required_news_promotes_to_blocking() -> None:
     )
 
     assert decision.stock_decision_status == STOCK_DECISION_BLOCKED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_NEWS_DATA.value in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_NEWS_DATA.value in decision.blocking_labels
 
 
 def test_incomplete_option_blocks_option_suitability_only() -> None:
@@ -290,16 +271,10 @@ def test_incomplete_option_blocks_option_suitability_only() -> None:
     )
 
     assert decision.option_status == INSUFFICIENT_OPTION_DATA
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_OPTION_DATA.value
-        in decision.non_blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_OPTION_DATA.value in decision.non_blocking_labels
     # Crucially, the stock decision is unaffected.
     assert decision.stock_decision_status == STOCK_DECISION_ALLOWED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_OPTION_DATA.value
-        not in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_OPTION_DATA.value not in decision.blocking_labels
 
 
 def test_iv_history_insufficient_is_non_blocking_by_default() -> None:
@@ -315,10 +290,7 @@ def test_iv_history_insufficient_is_non_blocking_by_default() -> None:
         profile=get_balanced_research_default(),
     )
     assert decision.stock_decision_status == STOCK_DECISION_ALLOWED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_IV_DATA.value
-        in decision.non_blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_IV_DATA.value in decision.non_blocking_labels
 
 
 def test_earnings_missing_is_non_blocking_by_default() -> None:
@@ -334,16 +306,11 @@ def test_earnings_missing_is_non_blocking_by_default() -> None:
         profile=get_balanced_research_default(),
     )
     assert decision.stock_decision_status == STOCK_DECISION_ALLOWED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_EARNINGS_DATA.value
-        in decision.non_blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_EARNINGS_DATA.value in decision.non_blocking_labels
 
 
 def test_profile_required_earnings_promotes_to_blocking() -> None:
-    profile = get_balanced_research_default().model_copy(
-        update={"requires_earnings_data": True}
-    )
+    profile = get_balanced_research_default().model_copy(update={"requires_earnings_data": True})
     gate = DataSufficiencyGate()
     decision = gate.evaluate_inputs(
         SufficiencyInputs(
@@ -356,10 +323,7 @@ def test_profile_required_earnings_promotes_to_blocking() -> None:
         profile=profile,
     )
     assert decision.stock_decision_status == STOCK_DECISION_BLOCKED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_EARNINGS_DATA.value
-        in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_EARNINGS_DATA.value in decision.blocking_labels
 
 
 def test_missing_memory_is_confidence_reducer_not_block() -> None:
@@ -375,24 +339,13 @@ def test_missing_memory_is_confidence_reducer_not_block() -> None:
         profile=get_balanced_research_default(),
     )
     assert decision.stock_decision_status == STOCK_DECISION_ALLOWED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_MEMORY_DATA.value
-        in decision.confidence_reducers
-    )
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_MEMORY_DATA.value
-        not in decision.blocking_labels
-    )
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_MEMORY_DATA.value
-        not in decision.non_blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_MEMORY_DATA.value in decision.confidence_reducers
+    assert DataSufficiencyLabel.INSUFFICIENT_MEMORY_DATA.value not in decision.blocking_labels
+    assert DataSufficiencyLabel.INSUFFICIENT_MEMORY_DATA.value not in decision.non_blocking_labels
 
 
 def test_profile_required_memory_promotes_to_blocking() -> None:
-    profile = get_balanced_research_default().model_copy(
-        update={"requires_memory_data": True}
-    )
+    profile = get_balanced_research_default().model_copy(update={"requires_memory_data": True})
     gate = DataSufficiencyGate()
     decision = gate.evaluate_inputs(
         SufficiencyInputs(
@@ -405,10 +358,7 @@ def test_profile_required_memory_promotes_to_blocking() -> None:
         profile=profile,
     )
     assert decision.stock_decision_status == STOCK_DECISION_BLOCKED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_MEMORY_DATA.value
-        in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_MEMORY_DATA.value in decision.blocking_labels
 
 
 def test_decision_to_dict_shape_is_stable() -> None:
@@ -421,8 +371,7 @@ def test_decision_to_dict_shape_is_stable() -> None:
             option_rows=_ok_option_rows(),
             news_rows=_news_rows(3),
             iv_history_rows=[
-                {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5}
-                for _ in range(40)
+                {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5} for _ in range(40)
             ],
             earnings_rows=[{"symbol": "AMD"}],
             memory_rows=[{"id": 1}],
@@ -539,7 +488,7 @@ def reset_db():
 def _seed_prices(symbol: str, count: int) -> None:
     session = _TestSession()
     try:
-        for i, row in enumerate(_price_rows(count)):
+        for _i, row in enumerate(_price_rows(count)):
             session.add(
                 DailyPrice(
                     symbol=symbol,
@@ -624,10 +573,7 @@ def test_evaluate_symbol_from_db_allows_stock_without_options() -> None:
     assert decision.symbol == "AMD"
     assert decision.stock_decision_status == STOCK_DECISION_ALLOWED
     assert decision.option_status == OPTION_DATA_NOT_AVAILABLE
-    assert (
-        DataSufficiencyLabel.OPTION_DATA_NOT_AVAILABLE.value
-        in decision.non_blocking_labels
-    )
+    assert DataSufficiencyLabel.OPTION_DATA_NOT_AVAILABLE.value in decision.non_blocking_labels
 
 
 def test_evaluate_symbol_from_db_blocks_when_no_prices() -> None:
@@ -640,10 +586,7 @@ def test_evaluate_symbol_from_db_blocks_when_no_prices() -> None:
         session.close()
 
     assert decision.stock_decision_status == STOCK_DECISION_BLOCKED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_PRICE_HISTORY.value
-        in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_PRICE_HISTORY.value in decision.blocking_labels
 
 
 def test_evaluate_symbol_normalizes_legacy_setup_label_from_db() -> None:
@@ -660,14 +603,8 @@ def test_evaluate_symbol_normalizes_legacy_setup_label_from_db() -> None:
         session.close()
 
     assert decision.stock_decision_status == STOCK_DECISION_BLOCKED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_STOCK_SETUP_DATA.value
-        in decision.blocking_labels
-    )
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_SETUP_DATA.value
-        not in decision.blocking_labels
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_STOCK_SETUP_DATA.value in decision.blocking_labels
+    assert DataSufficiencyLabel.INSUFFICIENT_SETUP_DATA.value not in decision.blocking_labels
 
 
 def test_sufficiency_route_returns_stable_shape() -> None:
@@ -708,10 +645,7 @@ def test_sufficiency_route_blocks_unknown_symbol() -> None:
     assert response.status_code == 200
     decision = response.json()["decision"]
     assert decision["stock_decision_status"] == STOCK_DECISION_BLOCKED
-    assert (
-        DataSufficiencyLabel.INSUFFICIENT_PRICE_HISTORY.value
-        in decision["blocking_labels"]
-    )
+    assert DataSufficiencyLabel.INSUFFICIENT_PRICE_HISTORY.value in decision["blocking_labels"]
 
 
 def test_sufficiency_route_rejects_empty_symbol() -> None:

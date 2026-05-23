@@ -1,0 +1,47 @@
+name: Deploy (VPS)
+
+# Phase 50.20 — VPS/domain deployment. Secret-gated: only runs the SSH deploy
+# when VPS_HOST / VPS_USER / VPS_SSH_KEY are configured. Manual dispatch only,
+# so it never forces a release.
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref / tag to deploy"
+        required: false
+        default: "main"
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - name: Guard on secrets
+        id: guard
+        run: |
+          if [ -z "${{ secrets.VPS_HOST }}" ] || [ -z "${{ secrets.VPS_SSH_KEY }}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "VPS secrets not configured; nothing to do (placeholder)."
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Deploy over SSH (docker compose pull + up)
+        if: steps.guard.outputs.configured == 'true'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            cd ${{ secrets.VPS_APP_DIR || '/opt/aonalyzer' }}
+            git fetch --all
+            git checkout ${{ github.event.inputs.ref }}
+            docker compose pull
+            docker compose up -d --build
+            docker compose ps
+      # Rollback hook (50.23): see docs/ci-cd-guide.md for the documented
+      # rollback procedure (re-deploy the previous tag).

@@ -21,7 +21,9 @@ from app.decision.decision_labels import (
 
 @dataclass(frozen=True)
 class EventRiskInputs:
-    earnings_risk_label: str | None = None  # NO_EARNINGS_NEAR / EARNINGS_INSIDE_WINDOW / EARNINGS_BEFORE_EXPIRATION / ...
+    earnings_risk_label: str | None = (
+        None  # NO_EARNINGS_NEAR / EARNINGS_INSIDE_WINDOW / EARNINGS_BEFORE_EXPIRATION / ...
+    )
     earnings_within_window: bool = False
     earnings_before_expiration: str | None = None  # TRUE / FALSE / NOT_APPLICABLE
     iv_state: str | None = None  # LOW / NORMAL / ELEVATED / HIGH / UNKNOWN

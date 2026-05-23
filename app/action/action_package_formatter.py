@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
+from app.action.action_items_generator import generate_action_items
 from app.action.action_labels import lifecycle_state_for
 from app.action.downgrade_condition_builder import (
     DowngradeCondition,
@@ -27,7 +28,6 @@ from app.action.invalidation_condition_builder import (
     build_invalidation_condition,
 )
 from app.action.manual_option_input_action_builder import (
-    ManualOptionInputAction,
     build_manual_option_input_action,
 )
 from app.action.next_review_trigger_builder import (
@@ -38,7 +38,6 @@ from app.action.option_contract_criteria_builder import (
     OptionContractCriteria,
     build_option_contract_criteria,
 )
-from app.action.action_items_generator import generate_action_items
 from app.action.suggested_action_summary import build_suggested_action_summary
 from app.action.upgrade_condition_builder import (
     UpgradeCondition,

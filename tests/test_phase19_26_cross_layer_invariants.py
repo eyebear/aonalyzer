@@ -47,7 +47,6 @@ from app.decision.decision_labels import (
 )
 from app.decision.decision_service import DecisionService
 from app.earnings.earnings_models import EarningsRiskSnapshot
-from app.lifecycle.lifecycle_models import OpportunityLifecycle
 from app.lifecycle.lifecycle_service import LifecycleService
 from app.lifecycle.lifecycle_states import (
     STATE_READY_FOR_RESEARCH,
@@ -71,7 +70,6 @@ from app.risk_control.do_not_touch_classifier import (
 )
 from app.risk_control.do_not_touch_models import DoNotTouchItem
 from app.risk_control.do_not_touch_service import DoNotTouchService
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

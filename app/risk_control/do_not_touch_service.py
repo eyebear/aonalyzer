@@ -24,9 +24,7 @@ from app.risk_control.do_not_touch_categories import (
     FREEZE_CATEGORY_MANUAL,
     SEVERITY_HARD_FREEZE,
     SEVERITY_SOFT_FREEZE,
-    SOURCE_PHASE_CLASSIFIER,
     SOURCE_PHASE_MANUAL,
-    TRIGGER_AUTOMATIC,
     TRIGGER_USER,
 )
 from app.risk_control.do_not_touch_classifier import (

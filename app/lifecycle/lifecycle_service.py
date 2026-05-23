@@ -24,7 +24,6 @@ from app.lifecycle.lifecycle_models import (
 )
 from app.lifecycle.lifecycle_states import (
     SOURCE_PHASE_PHASE22,
-    SOURCE_PHASE_REACTIVATION,
     TRIGGER_SYSTEM_EVALUATION,
     TRIGGER_SYSTEM_REACTIVATION,
 )

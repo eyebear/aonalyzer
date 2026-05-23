@@ -33,17 +33,17 @@ from app.hard_filter.hard_filter_gate import (
     DECISION_BLOCKED,
     EARNINGS_BEFORE_OPTION_EXPIRATION,
     EARNINGS_INSIDE_WINDOW,
-    EarningsContext,
-    HardFilterGate,
     OPTION_DECISION_ALLOWED,
     OPTION_DECISION_BLOCKED,
     OPTION_DECISION_NOT_EVALUATED,
-    OptionContext,
     PRICE_TOO_EXTENDED,
     REGIME_OPPOSES_SETUP,
+    WEAK_STOCK_RISK_REWARD,
+    EarningsContext,
+    HardFilterGate,
+    OptionContext,
     RegimeContext,
     StockContext,
-    WEAK_STOCK_RISK_REWARD,
 )
 from app.hard_filter.hard_filter_models import HardFilterResult
 from app.hard_filter.hard_filter_service import HardFilterService
@@ -53,7 +53,6 @@ from app.options.option_filters import DTE_TOO_SHORT, LOW_OPEN_INTEREST, SPREAD_
 from app.options.target_breakeven import TARGET_BELOW_BREAKEVEN
 from app.profiles.default_profiles import get_balanced_research_default
 from app.quant.stock_setup_models import StockSetup
-
 
 # ---------------------------------------------------------------------------
 # Helpers

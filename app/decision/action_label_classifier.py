@@ -18,7 +18,7 @@ Mapping rules (in evaluation order):
 2. Thesis ``NO_TRADE``                   -> final ``NO_TRADE``.
 3. Thesis ``WATCH``                      -> final ``WATCH_STOCK_ONLY``.
 4. Thesis ``WAIT_FOR_ENTRY``             -> final ``WAIT_FOR_ENTRY_STOCK_ONLY``.
-5. Thesis ``READY_TO_RESEARCH`` + scope ``OPTION_AVAILABLE``      -> ``READY_TO_RESEARCH_WITH_OPTION``.
+5. Thesis ``READY_TO_RESEARCH`` + scope ``OPTION_AVAILABLE`` -> ``READY_TO_RESEARCH_WITH_OPTION``.
 6. Thesis ``READY_TO_RESEARCH`` + scope ``OPTION_REJECTED``       -> ``STOCK_OK_OPTION_BAD``.
 7. Thesis ``READY_TO_RESEARCH`` + scope ``STOCK_ONLY``            ->
    - if ``option_data_requested`` -> ``OPTION_DATA_NOT_AVAILABLE``
@@ -38,7 +38,6 @@ from app.decision.decision_labels import (
     READY_TO_RESEARCH_WITH_OPTION,
     SCOPE_OPTION_AVAILABLE,
     SCOPE_OPTION_REJECTED,
-    SCOPE_STOCK_ONLY,
     STOCK_OK_OPTION_BAD,
     THESIS_INSUFFICIENT_PRICE_HISTORY,
     THESIS_NO_TRADE,

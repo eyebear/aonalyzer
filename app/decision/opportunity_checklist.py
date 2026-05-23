@@ -15,9 +15,13 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.data_quality.data_sufficiency_gate import (
-    GateDecision as SufficiencyDecision,
     OPTION_DATA_NOT_AVAILABLE as SUFFICIENCY_OPTION_NOT_AVAILABLE,
+)
+from app.data_quality.data_sufficiency_gate import (
     OPTION_OK as SUFFICIENCY_OPTION_OK,
+)
+from app.data_quality.data_sufficiency_gate import (
+    GateDecision as SufficiencyDecision,
 )
 from app.data_quality.data_sufficiency_labels import DataSufficiencyLabel
 from app.decision.decision_labels import (

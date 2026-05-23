@@ -27,7 +27,7 @@ def test_relative_strength_outperform() -> None:
     result = compute_relative_strength(
         sector_symbol="XLK",
         benchmark_symbol="SPY",
-        sector_closes=[100.0, 110.0, 121.0],   # +21%
+        sector_closes=[100.0, 110.0, 121.0],  # +21%
         benchmark_closes=[100.0, 101.0, 102.0],  # +2%
         lookback_days=2,
     )
@@ -40,7 +40,7 @@ def test_relative_strength_underperform() -> None:
     result = compute_relative_strength(
         sector_symbol="XLF",
         benchmark_symbol="SPY",
-        sector_closes=[100.0, 100.0, 100.0],   # 0%
+        sector_closes=[100.0, 100.0, 100.0],  # 0%
         benchmark_closes=[100.0, 101.0, 105.0],  # +5%
         lookback_days=2,
     )
@@ -52,7 +52,7 @@ def test_relative_strength_inline_within_band() -> None:
     result = compute_relative_strength(
         sector_symbol="XLE",
         benchmark_symbol="SPY",
-        sector_closes=[100.0, 100.0, 102.0],   # +2%
+        sector_closes=[100.0, 100.0, 102.0],  # +2%
         benchmark_closes=[100.0, 100.0, 102.0],  # +2%
         lookback_days=2,
         inline_band=0.005,
@@ -75,7 +75,9 @@ def test_relative_strength_insufficient() -> None:
 
 
 def test_assign_ranks_orders_by_relative_strength() -> None:
-    strong = compute_relative_strength("XLK", "SPY", [100.0, 110.0, 130.0], [100.0, 101.0, 102.0], 2)
+    strong = compute_relative_strength(
+        "XLK", "SPY", [100.0, 110.0, 130.0], [100.0, 101.0, 102.0], 2
+    )
     mid = compute_relative_strength("XLF", "SPY", [100.0, 105.0, 110.0], [100.0, 101.0, 102.0], 2)
     weak = compute_relative_strength("XLE", "SPY", [100.0, 100.0, 100.0], [100.0, 101.0, 102.0], 2)
     insufficient = compute_relative_strength("SMH", "SPY", [100.0], [100.0, 101.0, 102.0], 2)

@@ -51,13 +51,12 @@ from app.decision.stock_thesis_decision import StockThesisInputs
 from app.earnings.earnings_models import EarningsRiskSnapshot
 from app.hard_filter.hard_filter_gate import (
     EARNINGS_BEFORE_OPTION_EXPIRATION,
-    EARNINGS_INSIDE_WINDOW,
+    WEAK_STOCK_RISK_REWARD,
     EarningsContext,
     HardFilterGate,
     OptionContext,
     RegimeContext,
     StockContext,
-    WEAK_STOCK_RISK_REWARD,
 )
 from app.market_regime.market_regime_models import MarketRegimeSnapshot
 from app.options.iv_analysis import IV_TOO_HIGH
@@ -86,12 +85,10 @@ from app.rejection.rejection_categories import (
     SEVERITY_OPTION_ONLY_REJECT,
 )
 from app.rejection.rejection_classifier import classify_rejection
-from app.rejection.rejection_memory_writer import RejectionMemoryWriter
 from app.rejection.rejection_models import RejectedCandidate, RejectionReason
 from app.rejection.rejection_service import RejectionService
 from app.rejection.stock_ok_option_bad import detect_stock_ok_option_bad
 from app.rejection.stock_ok_option_missing import detect_stock_ok_option_missing
-
 
 # ---------------------------------------------------------------------------
 # Helpers (mirror Phase 21/22 fixtures)
@@ -126,9 +123,7 @@ def _ok_sufficiency_inputs(**overrides) -> SufficiencyInputs:
                 "event_time": datetime(2026, 5, 10, tzinfo=timezone.utc),
             }
         ],
-        iv_history_rows=[
-            {"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5} for _ in range(40)
-        ],
+        iv_history_rows=[{"snapshot_date": date(2026, 5, 1), "atm_iv_30d": 0.5} for _ in range(40)],
         earnings_rows=[{"symbol": "AMD"}],
         memory_rows=[{"id": 1}],
     )
@@ -410,9 +405,7 @@ def test_rejected_but_interesting_flags_strong_rr_with_regime_warning() -> None:
         regime=RegimeContext(regime_label="RISK_OFF"),
         earnings=EarningsContext(risk_label="NO_EARNINGS_NEAR"),
     )
-    result = classify_rejected_but_interesting(
-        decision, profile_minimum_risk_reward=2.0
-    )
+    result = classify_rejected_but_interesting(decision, profile_minimum_risk_reward=2.0)
     assert result.is_interesting is True
     assert any("Strong" not in r or "R:R" in r for r in result.reasons)
 
@@ -424,9 +417,7 @@ def test_rejected_but_interesting_does_not_flag_insufficient_data() -> None:
         regime=RegimeContext(regime_label="RISK_ON"),
         earnings=EarningsContext(risk_label="NO_EARNINGS_NEAR"),
     )
-    result = classify_rejected_but_interesting(
-        decision, profile_minimum_risk_reward=2.0
-    )
+    result = classify_rejected_but_interesting(decision, profile_minimum_risk_reward=2.0)
     assert result.is_interesting is False
 
 
@@ -437,9 +428,7 @@ def test_rejected_but_interesting_does_not_flag_healthy_candidate() -> None:
         regime=RegimeContext(regime_label="RISK_ON"),
         earnings=EarningsContext(risk_label="NO_EARNINGS_NEAR"),
     )
-    result = classify_rejected_but_interesting(
-        decision, profile_minimum_risk_reward=2.0
-    )
+    result = classify_rejected_but_interesting(decision, profile_minimum_risk_reward=2.0)
     assert result.is_interesting is False
 
 
@@ -552,7 +541,7 @@ def reset_db():
 def _seed_prices(symbol: str, n: int) -> None:
     session = _TestSession()
     try:
-        for i, row in enumerate(_price_rows(n)):
+        for _i, row in enumerate(_price_rows(n)):
             session.add(
                 DailyPrice(
                     symbol=symbol,
@@ -647,9 +636,7 @@ def test_service_persists_no_trade_with_reasons() -> None:
 
     session = _TestSession()
     try:
-        evaluation = RejectionService().evaluate_symbol(
-            session, "AMD", persist=True
-        )
+        evaluation = RejectionService().evaluate_symbol(session, "AMD", persist=True)
         candidate = session.query(RejectedCandidate).first()
         reasons = (
             session.query(RejectionReason)
@@ -711,9 +698,7 @@ def test_memory_writer_short_circuits_when_not_rejected() -> None:
 
     session = _TestSession()
     try:
-        evaluation = RejectionService().evaluate_symbol(
-            session, "AMD", persist=True
-        )
+        evaluation = RejectionService().evaluate_symbol(session, "AMD", persist=True)
         candidate_count = session.query(RejectedCandidate).count()
     finally:
         session.close()
@@ -873,7 +858,9 @@ def test_route_returns_evaluation_shape() -> None:
     assert response.status_code == 200, response.text
     body = response.json()
     assert body["status"] == "OK"
-    assert body["evaluation"]["classification"]["rejection_category"] == CATEGORY_HARD_STOCK_REJECTION
+    assert (
+        body["evaluation"]["classification"]["rejection_category"] == CATEGORY_HARD_STOCK_REJECTION
+    )
 
 
 def test_route_list_filters_by_category() -> None:
@@ -884,9 +871,7 @@ def test_route_list_filters_by_category() -> None:
 
     client = TestClient(app)
     client.get("/api/rejections/AMD?persist=true")
-    listing = client.get(
-        f"/api/rejections?category={CATEGORY_HARD_STOCK_REJECTION}"
-    ).json()
+    listing = client.get(f"/api/rejections?category={CATEGORY_HARD_STOCK_REJECTION}").json()
     assert listing["count"] == 1
     assert listing["candidates"][0]["rejection_category"] == CATEGORY_HARD_STOCK_REJECTION
 

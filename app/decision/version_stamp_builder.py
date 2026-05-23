@@ -25,6 +25,22 @@ DEFAULT_DATA_SCHEMA_VERSION = "aoao_schema_0.1"
 DEFAULT_ACTION_SUGGESTION_VERSION = "action_suggestion_0.1"
 DEFAULT_MODEL_VERSION = "deterministic_fallback"
 DEFAULT_PROMPT_VERSION = "deterministic_fallback"
+# Phase 46.7 — which manual-option parser read any pasted option text.
+DEFAULT_OPTION_PARSER_VERSION = "option_parser_0.1"
+
+# Every persisted decision must carry these eight version keys (Phase 46.11).
+REQUIRED_VERSION_KEYS = frozenset(
+    {
+        "rule_version",
+        "model_version",
+        "prompt_version",
+        "option_parser_version",
+        "strategy_profile_version",
+        "data_schema_version",
+        "decision_engine_version",
+        "action_suggestion_version",
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -36,6 +52,7 @@ class VersionStamp:
     action_suggestion_version: str
     model_version: str
     prompt_version: str
+    option_parser_version: str = DEFAULT_OPTION_PARSER_VERSION
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -46,6 +63,7 @@ class VersionStamp:
             "action_suggestion_version": self.action_suggestion_version,
             "model_version": self.model_version,
             "prompt_version": self.prompt_version,
+            "option_parser_version": self.option_parser_version,
         }
 
 
@@ -62,6 +80,9 @@ def build_version_stamp(
     action_suggestion = _lookup(
         db, "action_suggestion_version", DEFAULT_ACTION_SUGGESTION_VERSION
     )
+    option_parser = _lookup(
+        db, "option_parser_version", DEFAULT_OPTION_PARSER_VERSION
+    )
 
     profile_version = (
         profile.profile_version
@@ -71,6 +92,7 @@ def build_version_stamp(
 
     return VersionStamp(
         rule_version=rule,
+        option_parser_version=option_parser,
         strategy_profile_version=profile_version,
         data_schema_version=data_schema,
         decision_engine_version=engine,
@@ -101,8 +123,10 @@ __all__ = [
     "DEFAULT_DATA_SCHEMA_VERSION",
     "DEFAULT_DECISION_ENGINE_VERSION",
     "DEFAULT_MODEL_VERSION",
+    "DEFAULT_OPTION_PARSER_VERSION",
     "DEFAULT_PROMPT_VERSION",
     "DEFAULT_RULE_VERSION",
+    "REQUIRED_VERSION_KEYS",
     "VersionStamp",
     "build_version_stamp",
 ]

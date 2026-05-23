@@ -91,7 +91,6 @@ from app.market_regime.market_regime_models import MarketRegimeSnapshot
 from app.profiles.default_profiles import get_balanced_research_default
 from app.quant.stock_setup_models import StockSetup
 
-
 # ---------------------------------------------------------------------------
 # Helpers reused from Phase 21 tests
 # ---------------------------------------------------------------------------
@@ -620,7 +619,7 @@ def reset_db():
 def _seed_prices(symbol: str, n: int) -> None:
     session = _TestSession()
     try:
-        for i, row in enumerate(_price_rows(n)):
+        for _i, row in enumerate(_price_rows(n)):
             session.add(
                 DailyPrice(
                     symbol=symbol,

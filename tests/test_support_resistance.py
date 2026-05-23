@@ -68,7 +68,10 @@ def test_detect_support_resistance_returns_reasons_when_inputs_thin() -> None:
         swing_window=2,
     )
 
-    assert levels.nearest_support is None or "no swing low below current price" in levels.insufficient_reasons
+    assert (
+        levels.nearest_support is None
+        or "no swing low below current price" in levels.insufficient_reasons
+    )
     assert any("need at least" in r for r in levels.insufficient_reasons)
 
 

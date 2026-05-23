@@ -18,7 +18,6 @@ from typing import Any
 
 from app.decision.decision_labels import (
     OPTION_EXPR_BAD,
-    OPTION_EXPR_NOT_EVALUATED,
     OPTION_EXPR_OK,
     SCOPE_OPTION_AVAILABLE,
     SCOPE_OPTION_REJECTED,

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.database.base import Base
@@ -168,6 +168,31 @@ def list_recent_events(
         "count": len(events),
         "events": [_event_to_dict(event, freshness_checker) for event in events],
     }
+
+
+@router.post("/{event_id}/reviewed")
+def set_event_reviewed(
+    event_id: int,
+    payload: dict[str, Any] = Body(default_factory=dict),
+    session: Session = Depends(get_db_session),
+) -> dict[str, Any]:
+    """Phase 36.10 — persist the user's reviewed flag for an event."""
+    _ensure_event_table(session)
+
+    event = session.query(Event).filter(Event.id == event_id).one_or_none()
+    if event is None:
+        raise HTTPException(status_code=404, detail=f"Event {event_id} not found.")
+
+    reviewed = payload.get("reviewed", True)
+    if not isinstance(reviewed, bool):
+        raise HTTPException(status_code=400, detail="reviewed must be a boolean.")
+
+    event.is_reviewed = reviewed
+    session.commit()
+    session.refresh(event)
+
+    freshness_checker = EventFreshnessChecker()
+    return {"status": "OK", "event": _event_to_dict(event, freshness_checker)}
 
 
 @router.get("/{event_id}")

@@ -207,7 +207,11 @@ def _score(
     elif setup_type == SETUP_OVERSOLD_BOUNCE_WATCH:
         if inp.rsi_14 is not None and inp.rsi_14 <= params.rsi_oversold - 10:
             components["deep_oversold"] = 10
-        if inp.bollinger_lower is not None and inp.close is not None and inp.close <= inp.bollinger_lower:
+        if (
+            inp.bollinger_lower is not None
+            and inp.close is not None
+            and inp.close <= inp.bollinger_lower
+        ):
             components["below_lower_band"] = 5
 
     score = sum(components.values())
@@ -239,7 +243,9 @@ def detect_setup(
     if _is_uptrend(inputs):
         if _is_pullback_long(inputs, params):
             setup_type, direction = SETUP_PULLBACK_LONG, DIRECTION_LONG
-            reasons.append("Uptrend with pullback toward the 20-day MA holding above the 50-day MA.")
+            reasons.append(
+                "Uptrend with pullback toward the 20-day MA holding above the 50-day MA."
+            )
         elif _is_breakout_retest_long(inputs, params):
             setup_type, direction = SETUP_BREAKOUT_RETEST_LONG, DIRECTION_LONG
             reasons.append("Uptrend retesting the prior breakout / resistance level.")
@@ -254,7 +260,9 @@ def detect_setup(
     if setup_type is None:
         if _is_oversold(inputs, params):
             setup_type, direction = SETUP_OVERSOLD_BOUNCE_WATCH, DIRECTION_WATCH
-            reasons.append("Oversold (RSI <= threshold): watch-only for a potential rebound, no entry.")
+            reasons.append(
+                "Oversold (RSI <= threshold): watch-only for a potential rebound, no entry."
+            )
         else:
             setup_type, direction = SETUP_NO_TRADE, DIRECTION_NONE
             reasons.append("No clear setup pattern matched; rejecting as NO_TRADE.")

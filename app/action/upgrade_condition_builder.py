@@ -54,8 +54,7 @@ def build_upgrade_condition(
 
     if lifecycle_state == LIFECYCLE_INSUFFICIENT_DATA:
         triggers.append(
-            "Refresh market data and confirm sufficient price history before "
-            "re-evaluating."
+            "Refresh market data and confirm sufficient price history before " "re-evaluating."
         )
 
     if lifecycle_state == LIFECYCLE_WAITING_FOR_ENTRY:
@@ -65,7 +64,9 @@ def build_upgrade_condition(
                 f"[{entry_zone_low:.2f}, {entry_zone_high:.2f}] upgrades to READY_FOR_RESEARCH."
             )
         else:
-            triggers.append("Price returning into a defined entry zone upgrades to READY_FOR_RESEARCH.")
+            triggers.append(
+                "Price returning into a defined entry zone upgrades to READY_FOR_RESEARCH."
+            )
 
     if lifecycle_state == LIFECYCLE_WATCHING:
         if REGIME_OPPOSES_SETUP in warnings:

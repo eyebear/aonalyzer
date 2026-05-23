@@ -123,7 +123,7 @@ class DecisionService:
         event_risk_inputs = self._build_event_risk_inputs(
             db=db, symbol=clean, option_snapshot=option_snapshot
         )
-        memory_risk_inputs = MemoryRiskInputs(memory_data_available=False)
+        memory_risk_inputs = self._build_memory_risk_inputs(db=db, symbol=clean)
 
         decision = build_final_decision(
             symbol=clean,
@@ -236,6 +236,41 @@ class DecisionService:
             news_data_available=news_available,
         )
 
+    def _build_memory_risk_inputs(self, db: Session, symbol: str) -> MemoryRiskInputs:
+        """Phase 42.10 — derive memory risk from stored case memory.
+
+        Backward-compatible: when no case memory exists for the symbol (the
+        default for fresh data and all pre-Phase-41 tests), this returns the
+        original ``memory_data_available=False`` input, so the deterministic
+        labels, confidence, and priority are unchanged. Memory only ever feeds
+        the memory-risk component — it never overrides sufficiency / hard
+        filters / the final label.
+        """
+        try:
+            from app.memory.case_memory_models import CaseMemory
+
+            cases = (
+                db.query(CaseMemory)
+                .filter(CaseMemory.symbol == symbol)
+                .all()
+            )
+        except Exception:
+            return MemoryRiskInputs(memory_data_available=False)
+
+        if not cases:
+            return MemoryRiskInputs(memory_data_available=False)
+
+        negative_outcomes = {"STOP_HIT", "STOCK_RIGHT_OPTION_WRONG"}
+        negative = sum(
+            1 for c in cases if (c.outcome_type or "").upper() in negative_outcomes
+        )
+        share = negative / len(cases)
+        return MemoryRiskInputs(
+            similar_case_count=len(cases),
+            negative_outcome_share=share,
+            memory_data_available=True,
+        )
+
     def _classify_iv_state(self, iv: IvRiskSnapshot) -> str | None:
         if iv.iv_reject_threshold is not None and iv.current_iv is not None:
             if iv.current_iv >= iv.iv_reject_threshold:
@@ -304,14 +339,38 @@ class DecisionService:
             )
             db.add(row)
             db.commit()
+            # Governance audit commits internally (expiring instances); refresh
+            # the decision row *after* it so the returned row's attributes stay
+            # loaded once the session is closed.
+            self._write_governance_audit(db, decision, snapshot_date)
             db.refresh(row)
             return row
 
         for key, value in values.items():
             setattr(existing, key, value)
         db.commit()
+        self._write_governance_audit(db, decision, snapshot_date)
         db.refresh(existing)
         return existing
+
+    def _write_governance_audit(
+        self, db: Session, decision: FinalDecision, snapshot_date: date
+    ) -> None:
+        """Phase 46.10 — persist the decision's version stamp for audit.
+
+        Best-effort: a governance write must never break a decision persist.
+        """
+        try:
+            from app.governance.version_service import GovernanceService
+
+            GovernanceService().write_audit(
+                db=db,
+                symbol=decision.symbol or "",
+                snapshot_date=snapshot_date,
+                version_stamp=decision.version_stamp.to_dict(),
+            )
+        except Exception:
+            db.rollback()
 
 
 __all__ = ["DecisionEvaluation", "DecisionService"]

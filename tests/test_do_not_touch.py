@@ -90,7 +90,6 @@ from app.risk_control.freeze_expiration_monitor import FreezeExpirationMonitor
 from app.risk_control.release_condition_builder import build_release_condition
 from app.risk_control.temporary_freeze_manager import TemporaryFreezeManager
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -396,7 +395,7 @@ def reset_db():
 def _seed_prices(symbol: str, n: int) -> None:
     session = _TestSession()
     try:
-        for i, row in enumerate(_price_rows(n)):
+        for _i, row in enumerate(_price_rows(n)):
             session.add(
                 DailyPrice(
                     symbol=symbol,
