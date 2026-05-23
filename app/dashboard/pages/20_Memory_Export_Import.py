@@ -38,7 +38,7 @@ if cols[0].button("Validate package") and package_dir:
     result = post_json("/api/export-import/validate", {"package_dir": package_dir})
     if result is not None:
         validation = result.get("validation") or {}
-        if validation.get("is_valid", validation.get("valid")):
+        if validation.get("valid"):
             st.success("Package is valid.")
         else:
             st.warning("Package validation reported problems — see diagnostics.")

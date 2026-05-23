@@ -42,6 +42,27 @@ def test_opportunity_row_first_visible_fields() -> None:
     assert row["action_items"]
 
 
+def test_opportunity_row_next_review_is_always_readable_text() -> None:
+    """The next-review column must never render a raw dict."""
+    base = {
+        "symbol": "AMD",
+        "final_action_label": "WATCH_STOCK_ONLY",
+        "instrument_scope": "STOCK_ONLY",
+        "option_expression_status": "OPTION_EXPR_NOT_EVALUATED",
+    }
+    # Dict without a known display key falls back to joined scalars.
+    row = build_opportunity_row(
+        {**base, "next_review_trigger": {"review_after": "2026-06-01", "armed": True}}
+    )
+    assert isinstance(row["next_review_trigger"], str)
+    assert "review_after: 2026-06-01" in row["next_review_trigger"]
+    # Missing / empty trigger renders as a placeholder, not "{}".
+    row = build_opportunity_row({**base, "next_review_trigger": {}})
+    assert row["next_review_trigger"] == "—"
+    row = build_opportunity_row(base)
+    assert row["next_review_trigger"] == "—"
+
+
 def test_opportunity_row_missing_option_is_prompt_not_rejection() -> None:
     suggestion = {
         "symbol": "NVDA",
