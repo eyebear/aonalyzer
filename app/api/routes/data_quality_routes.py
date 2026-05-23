@@ -4,6 +4,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.common.service_utils import ensure_tables
 from app.data_quality.data_quality_checker import (
     DataFreshnessChecker,
     DataQualityChecker,
@@ -13,8 +14,7 @@ from app.data_quality.data_quality_models import (
     InsufficientDataEvent,
 )
 from app.data_quality.data_sufficiency_gate import DataSufficiencyGate
-from app.database.base import Base
-from app.database.connection import SessionLocal, engine
+from app.database.connection import SessionLocal
 
 router = APIRouter(prefix="/api/data-quality", tags=["data-quality"])
 
@@ -41,14 +41,9 @@ def get_db() -> Session:
         db.close()
 
 
-def ensure_data_quality_tables(db: Session | None = None) -> None:
-    # Bind to the active session's engine when available so the call honors
-    # dependency-overridden sessions (tests, alternate engines); fall back to
-    # the module-level engine only when no session is supplied. For a real
-    # Postgres deployment the bound engine *is* the module engine, so behavior
-    # is unchanged. Mirrors the project-wide ``ensure_tables(db)`` convention.
-    bind = db.get_bind() if db is not None else engine
-    Base.metadata.create_all(bind=bind)
+def ensure_data_quality_tables(db: Session) -> None:
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    ensure_tables(db)
 
 
 @router.get("/status")

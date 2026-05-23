@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.agent.manual_refresh_controller import manual_refresh_controller
 from app.api.dto import AgentRunResponse, TickerListResponse, TickerResponse
-from app.database.base import Base
+from app.common.service_utils import ensure_tables
 from app.database.connection import get_db_session
 from app.database.models import Event, Ticker, Watchlist
 from app.earnings.earnings_models import EarningsRiskSnapshot
@@ -114,7 +114,8 @@ def list_ticker_events(
     limit: int = Query(default=100, ge=1, le=500),
     session: Session = Depends(get_db_session),
 ) -> dict:
-    Base.metadata.create_all(bind=session.get_bind())
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    ensure_tables(session)
 
     query = session.query(Event).filter(Event.symbol == symbol.upper())
 
@@ -168,7 +169,8 @@ def list_ticker_technical_snapshots(
     limit: int = Query(default=30, ge=1, le=500),
     session: Session = Depends(get_db_session),
 ) -> dict:
-    Base.metadata.create_all(bind=session.get_bind())
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    ensure_tables(session)
 
     snapshots = (
         session.query(TechnicalSnapshot)
@@ -223,7 +225,8 @@ def get_ticker_earnings_risk(
     symbol: str,
     session: Session = Depends(get_db_session),
 ) -> dict:
-    Base.metadata.create_all(bind=session.get_bind())
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    ensure_tables(session)
 
     snapshot = (
         session.query(EarningsRiskSnapshot)
@@ -273,7 +276,8 @@ def get_ticker_iv_risk(
     symbol: str,
     session: Session = Depends(get_db_session),
 ) -> dict:
-    Base.metadata.create_all(bind=session.get_bind())
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    ensure_tables(session)
 
     snapshot = (
         session.query(IvRiskSnapshot)
@@ -319,7 +323,8 @@ def get_ticker_stock_setup(
     symbol: str,
     session: Session = Depends(get_db_session),
 ) -> dict:
-    Base.metadata.create_all(bind=session.get_bind())
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    ensure_tables(session)
 
     setup = (
         session.query(StockSetup)

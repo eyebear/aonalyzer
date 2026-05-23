@@ -5,7 +5,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.agent.market_data_refresh_job import record_agent_run
-from app.database.base import Base
+from app.common.service_utils import ensure_tables
 from app.quant.technical_analysis_service import TechnicalAnalysisService
 
 
@@ -16,7 +16,7 @@ def run_technical_refresh_job(
     trigger_source: str = "API",
     technical_service: TechnicalAnalysisService | None = None,
 ) -> dict[str, Any]:
-    Base.metadata.create_all(bind=db.get_bind())
+    ensure_tables(db)
 
     service = technical_service or TechnicalAnalysisService()
 

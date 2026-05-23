@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from app.common.service_utils import load_watchlist_symbols, normalize_symbols
-from app.database.base import Base
+from app.common.service_utils import ensure_tables, load_watchlist_symbols, normalize_symbols
 from app.database.models import DailyPrice
 from app.quant.technical_indicators import (
     average_true_range,
@@ -34,7 +33,8 @@ class TechnicalAnalysisService:
         self._minimum_rows = minimum_rows_for_any_indicator()
 
     def ensure_technical_tables(self, db: Session) -> None:
-        Base.metadata.create_all(bind=db.get_bind())
+        # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+        ensure_tables(db)
 
     def load_watchlist_symbols(self, db: Session) -> list[str]:
         """Match the loader pattern used by MarketDataService / NewsService."""

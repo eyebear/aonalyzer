@@ -5,7 +5,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.agent.market_data_refresh_job import record_agent_run
-from app.database.base import Base
+from app.common.service_utils import ensure_tables
 from app.earnings.earnings_calendar_service import EarningsCalendarService
 from app.earnings.earnings_risk_service import EarningsRiskService
 
@@ -19,7 +19,7 @@ def run_earnings_calendar_refresh_job(
     earnings_risk_service: EarningsRiskService | None = None,
     skip_risk_snapshot: bool = False,
 ) -> dict[str, Any]:
-    Base.metadata.create_all(bind=db.get_bind())
+    ensure_tables(db)
 
     calendar_service = earnings_calendar_service or EarningsCalendarService()
     risk_service = earnings_risk_service or EarningsRiskService()

@@ -6,7 +6,7 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.database.base import Base
+from app.common.service_utils import ensure_tables
 from app.database.connection import get_db_session
 from app.quant.technical_snapshot_models import TechnicalSnapshot
 
@@ -14,7 +14,8 @@ router = APIRouter(prefix="/api/technical", tags=["technical"])
 
 
 def _ensure_technical_table(session: Session) -> None:
-    Base.metadata.create_all(bind=session.get_bind())
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    ensure_tables(session)
 
 
 def _snapshot_to_dict(snapshot: TechnicalSnapshot) -> dict[str, Any]:

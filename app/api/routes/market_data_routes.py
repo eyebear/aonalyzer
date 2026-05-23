@@ -5,9 +5,9 @@ from typing import Any
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from app.common.service_utils import ensure_tables
 from app.data_quality.data_quality_models import DataFreshness
-from app.database.base import Base
-from app.database.connection import SessionLocal, engine
+from app.database.connection import SessionLocal
 from app.market_data.market_data_models import (
     DailyPrice,
     FailedTickerLog,
@@ -25,8 +25,11 @@ def get_db() -> Session:
         db.close()
 
 
-def ensure_market_data_tables() -> None:
-    Base.metadata.create_all(bind=engine)
+def ensure_market_data_tables(db: Session) -> None:
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    # Binds to the request session's engine so dependency-overridden test
+    # sessions are honored instead of the module-level production engine.
+    ensure_tables(db)
 
 
 @router.get("/market-data/daily-prices")
@@ -35,7 +38,7 @@ def get_daily_prices(
     limit: int = 200,
     db: Session = Depends(get_db),
 ) -> dict[str, Any]:
-    ensure_market_data_tables()
+    ensure_market_data_tables(db)
 
     query = db.query(DailyPrice)
 
@@ -78,7 +81,7 @@ def get_intraday_prices(
     limit: int = 200,
     db: Session = Depends(get_db),
 ) -> dict[str, Any]:
-    ensure_market_data_tables()
+    ensure_market_data_tables(db)
 
     query = db.query(IntradayPrice)
 
@@ -119,7 +122,7 @@ def get_failed_ticker_logs(
     limit: int = 100,
     db: Session = Depends(get_db),
 ) -> dict[str, Any]:
-    ensure_market_data_tables()
+    ensure_market_data_tables(db)
 
     rows = (
         db.query(FailedTickerLog)
@@ -150,7 +153,7 @@ def get_failed_ticker_logs(
 def get_market_data_freshness(
     db: Session = Depends(get_db),
 ) -> dict[str, Any]:
-    ensure_market_data_tables()
+    ensure_market_data_tables(db)
 
     row = (
         db.query(DataFreshness)

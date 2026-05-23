@@ -5,7 +5,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.agent.market_data_refresh_job import record_agent_run
-from app.database.base import Base
+from app.common.service_utils import ensure_tables
 from app.iv_history.iv_history_service import IvHistoryService
 from app.iv_history.iv_risk_service import IvRiskService
 
@@ -19,7 +19,7 @@ def run_iv_risk_refresh_job(
     iv_risk_service: IvRiskService | None = None,
     skip_history_fetch: bool = False,
 ) -> dict[str, Any]:
-    Base.metadata.create_all(bind=db.get_bind())
+    ensure_tables(db)
 
     history_service = iv_history_service or IvHistoryService()
     risk_service = iv_risk_service or IvRiskService()

@@ -112,13 +112,22 @@ def load_watchlist_symbols(db: Session) -> list[str]:
 
 
 def ensure_tables(db: Session) -> None:
-    """Materialize all currently-registered ORM tables on the bound engine.
+    """Materialize ORM tables on the bound engine — test/dev fallback only.
 
-    Mirrors the established create-all-on-first-use convention; the set of tables
-    created equals whatever models are registered on ``Base.metadata`` at call
-    time (unchanged from the previous per-service implementations).
+    On PostgreSQL this is a deliberate no-op: the production schema is owned
+    exclusively by Alembic (``alembic upgrade head``, applied automatically by
+    the API container on startup). A genuinely missing table therefore
+    surfaces as a clear "relation does not exist" database error instead of
+    being silently created outside migration control.
+
+    On any other dialect (the SQLite engines used by unit tests and ad-hoc
+    local sessions) it still runs ``Base.metadata.create_all`` so those
+    environments work without running migrations.
     """
-    Base.metadata.create_all(bind=db.get_bind())
+    bind = db.get_bind()
+    if bind.dialect.name == "postgresql":
+        return
+    Base.metadata.create_all(bind=bind)
 
 
 __all__ = [

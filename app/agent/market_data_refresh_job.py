@@ -5,8 +5,7 @@ from typing import Any
 from sqlalchemy.orm import Session
 
 from app.agent.agent_run_recorder import record_agent_run
-from app.database.base import Base
-from app.database.connection import engine
+from app.common.service_utils import ensure_tables
 from app.market_data.market_data_service import MarketDataService
 
 
@@ -21,7 +20,9 @@ def run_market_data_refresh_job(
     intraday_period: str = "1d",
     intraday_interval: str = "5m",
 ) -> dict[str, Any]:
-    Base.metadata.create_all(bind=engine)
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    # Bound to the job session's engine so test-injected sessions are honored.
+    ensure_tables(db)
 
     service = MarketDataService()
 

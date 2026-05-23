@@ -6,7 +6,7 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.database.base import Base
+from app.common.service_utils import ensure_tables
 from app.database.connection import get_db_session
 from app.database.models import Event
 from app.event_normalizer.event_labels import (
@@ -19,7 +19,8 @@ router = APIRouter(prefix="/api/events", tags=["events"])
 
 
 def _ensure_event_table(session: Session) -> None:
-    Base.metadata.create_all(bind=session.get_bind())
+    # Test/dev fallback only — no-op on PostgreSQL (schema owned by Alembic).
+    ensure_tables(session)
 
 
 def _event_to_dict(event: Event, freshness_checker: EventFreshnessChecker) -> dict[str, Any]:
