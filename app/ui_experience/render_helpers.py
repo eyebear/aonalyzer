@@ -27,6 +27,49 @@ _PRIORITY_BADGES = {
     "LOW": "🟡 LOW",
 }
 
+# User-facing display text for the eight final action labels. The raw enum
+# values stay in the API/database (other layers key off them); these strings
+# are presentation-only. Diagnostic "cannot decide yet" labels get a plain
+# explanation instead of the raw code.
+_ACTION_LABEL_DISPLAY = {
+    "READY_TO_RESEARCH_STOCK_ONLY": "Ready to research (stock only)",
+    "READY_TO_RESEARCH_WITH_OPTION": "Ready to research (with option)",
+    "WATCH_STOCK_ONLY": "Watch",
+    "WAIT_FOR_ENTRY_STOCK_ONLY": "Wait for entry",
+    "STOCK_OK_OPTION_BAD": "Stock OK — option rejected",
+    "OPTION_DATA_NOT_AVAILABLE": "Awaiting option data",
+    "NO_TRADE": "No trade",
+    "INSUFFICIENT_PRICE_HISTORY": "Not enough price history yet",
+}
+
+# Next step shown alongside non-actionable diagnostic labels.
+_ACTION_LABEL_NEXT_STEP = {
+    "INSUFFICIENT_PRICE_HISTORY": (
+        "Not enough price history to make a decision yet. Refresh market "
+        "data for this ticker; it needs more historical bars before signal "
+        "tracking can run."
+    ),
+    "OPTION_DATA_NOT_AVAILABLE": (
+        "Paste a manual option contract to evaluate the option side; the "
+        "stock thesis is unaffected."
+    ),
+}
+
+
+def action_label_display(label: str | None) -> str:
+    """User-facing text for a final action label (never the raw enum code)."""
+    if not label:
+        return "—"
+    clean = str(label).strip().upper()
+    return _ACTION_LABEL_DISPLAY.get(clean, clean.replace("_", " ").capitalize())
+
+
+def action_label_next_step(label: str | None) -> str | None:
+    """Next-step guidance for diagnostic labels; None for actionable ones."""
+    if not label:
+        return None
+    return _ACTION_LABEL_NEXT_STEP.get(str(label).strip().upper())
+
 
 def format_score(value: float | None) -> str:
     """Format a 0-100 score; absent values render as an em dash."""
@@ -109,6 +152,8 @@ def sort_worklist_items(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 __all__ = [
+    "action_label_display",
+    "action_label_next_step",
     "format_score",
     "group_worklist_by_type",
     "instrument_scope_label",

@@ -7,6 +7,7 @@ helpers (option-data warning derivation, worklist grouping, score formatting).
 
 from __future__ import annotations
 
+from app.decision.decision_labels import FINAL_LABELS
 from app.ui_experience.field_priority import (
     ADVANCED,
     PRIMARY,
@@ -14,6 +15,8 @@ from app.ui_experience.field_priority import (
     FieldPriorityManager,
 )
 from app.ui_experience.render_helpers import (
+    action_label_display,
+    action_label_next_step,
     format_score,
     group_worklist_by_type,
     instrument_scope_label,
@@ -108,6 +111,38 @@ def test_instrument_scope_label() -> None:
     assert instrument_scope_label("STOCK_ONLY") == "Stock only"
     assert instrument_scope_label("OPTION_REJECTED") == "Option rejected"
     assert instrument_scope_label(None) == "—"
+
+
+def test_action_label_display_never_shows_raw_diagnostic_code() -> None:
+    """INSUFFICIENT_PRICE_HISTORY must render as readable text, not the enum."""
+    display = action_label_display("INSUFFICIENT_PRICE_HISTORY")
+    assert display != "INSUFFICIENT_PRICE_HISTORY"
+    assert "_" not in display
+    assert "price history" in display.lower()
+
+
+def test_action_label_display_covers_every_final_label() -> None:
+    for label in FINAL_LABELS:
+        display = action_label_display(label)
+        assert display != label, f"{label} is shown as a raw enum code"
+        assert "_" not in display
+
+
+def test_action_label_display_handles_unknown_and_missing() -> None:
+    assert action_label_display(None) == "—"
+    assert action_label_display("") == "—"
+    # Unknown labels degrade to humanized text rather than crashing.
+    assert action_label_display("SOME_FUTURE_LABEL") == "Some future label"
+
+
+def test_action_label_next_step_explains_insufficient_history() -> None:
+    guidance = action_label_next_step("INSUFFICIENT_PRICE_HISTORY")
+    assert guidance is not None
+    assert "refresh market data" in guidance.lower()
+    assert "historical bars" in guidance.lower()
+    # Actionable labels need no extra guidance.
+    assert action_label_next_step("READY_TO_RESEARCH_STOCK_ONLY") is None
+    assert action_label_next_step(None) is None
 
 
 def test_option_data_warning_missing_data_is_prompt_not_rejection() -> None:
