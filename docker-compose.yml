@@ -40,8 +40,11 @@ services:
       context: .
       dockerfile: Dockerfile.api
     container_name: aonalyzer-api
+    # .env is a local-development override only; every required value has an
+    # explicit default below so `docker compose config` stays valid without it.
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       APP_NAME: "Aonalyzer"
       APP_TECHNICAL_NAME: "aonalyzer"
@@ -63,6 +66,9 @@ services:
       DEFAULT_STRATEGY_PROFILE: "Balanced Research Default"
     ports:
       - "8000:8000"
+    # Apply migrations before serving so the schema is migration-driven, not
+    # dependent on lazy runtime table creation. ``upgrade head`` is idempotent.
+    command: sh -c "alembic upgrade head && uvicorn app.api.main:app --host 0.0.0.0 --port 8000"
     volumes:
       - .:/app
       - aonalyzer_exports:/app/exports
@@ -82,7 +88,8 @@ services:
       dockerfile: Dockerfile.agent
     container_name: aonalyzer-agent
     env_file:
-      - .env
+      - path: .env
+        required: false
     environment:
       APP_NAME: "Aonalyzer"
       APP_TECHNICAL_NAME: "aonalyzer"

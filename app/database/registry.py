@@ -1,15 +1,20 @@
 """Central import point that registers every ORM model on ``Base.metadata``.
 
-The project materializes most non-core tables lazily via ``create_all`` (see
-``app.common.service_utils.ensure_tables``), so model classes live in per-domain
-modules rather than a single file. Importing this module guarantees that *all*
-ORM tables are registered on ``Base.metadata``. It is used by Alembic's
-``env.py`` so the migration metadata is complete, and is available anywhere the
-full schema needs to be created at once.
+Model classes live in per-domain modules rather than a single file. Importing
+this module guarantees that *all* ORM tables are registered on
+``Base.metadata``. It is used by Alembic's ``env.py`` so the migration
+metadata is complete, and is available anywhere the full schema needs to be
+created at once.
 
-When a later phase adds a new ORM model module, import it here so the registry
-stays authoritative. (Modules that only define dataclasses or persist via raw
-SQL -- e.g. ``app.options.manual_option_models`` -- intentionally have no entry.)
+The schema is owned by Alembic migrations (``alembic upgrade head`` creates
+every table from a clean database). ``ensure_tables`` /
+``Base.metadata.create_all`` remains only as a test/dev convenience for
+SQLite-backed unit tests and is a no-op against a migrated database.
+
+When a later phase adds a new ORM model module, import it here AND add an
+Alembic revision for its tables. (Modules that only define dataclasses or
+persist via raw SQL -- e.g. ``app.options.manual_option_models`` --
+intentionally have no entry.)
 """
 
 from __future__ import annotations

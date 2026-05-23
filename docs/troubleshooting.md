@@ -2,17 +2,22 @@
 
 ## Docker / Compose
 
-- **Services won't start:** `docker compose logs <service>`. Confirm `.env`
-  exists (`cp .env.example .env`) and ports 8000/8501/5434/6379 are free.
+- **Services won't start:** `docker compose logs <service>`. Ports
+  8000/8501/5434/6379 must be free. `.env` is optional (local overrides only);
+  create it with `cp .env.example .env` when you need to change defaults.
 - **Rebuild after code changes:** `docker compose up -d --build`.
 
 ## Database / migrations
 
 - **`alembic upgrade head` fails to connect:** confirm `DATABASE_URL` and that
   Postgres is healthy (`docker compose ps`). Host port is `5434`.
-- **Table missing for a Phase 9+ feature:** most non-core tables are created
-  lazily via `ensure_tables` on first use. They appear once the relevant service
-  runs once. Core tables come from the Alembic migration.
+- **`extension "vector" is not available`:** pgvector is optional. Migration
+  0001 only enables it when the server ships it (the compose
+  `pgvector/pgvector:pg16` image does; vanilla `postgres:16` does not).
+  Embeddings are stored as portable JSON either way.
+- **Table missing for a Phase 9+ feature:** run `alembic upgrade head` — every
+  ORM table is created by migrations 0001/0002. The API container applies
+  migrations on startup; `ensure_tables` remains only as a test/dev fallback.
 - **"Table already defined" on import:** a duplicate ORM table name — check the
   registry; reuse the existing model rather than redefining a table.
 

@@ -19,11 +19,16 @@ docker compose up -d --build
 docker compose ps
 ```
 
-Apply migrations (the API entrypoint can run them, or run manually):
+Migrations are applied automatically by the API container on startup
+(`alembic upgrade head` runs before uvicorn). To apply them manually:
 
 ```bash
 docker compose exec aonalyzer-api alembic upgrade head
 ```
+
+pgvector is optional: the compose Postgres image (`pgvector/pgvector:pg16`)
+ships it and the migration enables it; on a vanilla PostgreSQL server the
+migration skips it and embeddings fall back to portable JSON storage.
 
 ## Configuration
 

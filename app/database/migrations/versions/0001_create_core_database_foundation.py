@@ -17,7 +17,25 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    op.execute("CREATE EXTENSION IF NOT EXISTS vector")
+    # pgvector is OPTIONAL. No table in this schema uses a native ``vector``
+    # column (embeddings are stored as portable JSON — see
+    # ``app.memory.memory_embedding_models``). Enable the extension only when
+    # the server actually ships it (e.g. the ``pgvector/pgvector:pg16`` image
+    # used by docker-compose); degrade cleanly on vanilla PostgreSQL such as
+    # the ``postgres:16`` CI service container.
+    op.execute(
+        """
+        DO $$
+        BEGIN
+            IF EXISTS (
+                SELECT 1 FROM pg_available_extensions WHERE name = 'vector'
+            ) THEN
+                CREATE EXTENSION IF NOT EXISTS vector;
+            END IF;
+        END
+        $$;
+        """
+    )
 
     op.create_table(
         "tickers",

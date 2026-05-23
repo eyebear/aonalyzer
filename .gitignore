@@ -5,10 +5,19 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .coverage
+coverage.xml
 htmlcov/
+pytest-report.xml
 
 .env
+.env.*.local
 .DS_Store
+.streamlit/
+
+# Local databases / generated data
+*.sqlite
+*.sqlite3
+*.db
 
 data/raw/
 data/processed/
