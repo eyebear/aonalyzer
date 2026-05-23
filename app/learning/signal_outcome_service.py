@@ -218,6 +218,10 @@ class SignalOutcomeService:
         Otherwise the status is UNAVAILABLE (never zero, never failed). The
         estimate uses the pasted delta / premium / underlying — no values are
         invented; if any are missing the status stays UNAVAILABLE.
+
+        PROXY, NOT MARKET-PRICED P&L: the ESTIMATED return is a first-order
+        delta approximation (delta x underlying move / premium). It ignores
+        theta decay, gamma, and IV change. See OPTION_OUTCOME_PROXY_NOTE.
         """
         snap = ctx.manual_option_snapshot
         if snap is None or stock_return_pct is None:

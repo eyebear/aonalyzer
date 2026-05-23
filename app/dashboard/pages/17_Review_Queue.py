@@ -64,11 +64,11 @@ def _post(path: str, body: dict | None = None) -> dict | None:
 if st.button("Run trigger evaluation now"):
     result = _post("/api/review-queue/run-triggers", {})
     if result is not None:
-        body = result["result"]
+        body = (result.get("result") or {}).get("result") or {}
         st.success(
-            f"Processed {body['result']['symbols_processed']} symbol(s); "
-            f"created {body['result']['queue_items_created']} item(s), "
-            f"refreshed {body['result']['queue_items_refreshed']} item(s)."
+            f"Processed {body.get('symbols_processed', 0)} symbol(s); "
+            f"created {body.get('queue_items_created', 0)} item(s), "
+            f"refreshed {body.get('queue_items_refreshed', 0)} item(s)."
         )
 
 # --- Filters --------------------------------------------------------------

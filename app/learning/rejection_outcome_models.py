@@ -37,6 +37,16 @@ WOULD_OPTION_UNAVAILABLE = "UNAVAILABLE"
 WOULD_OPTION_TRUE = "TRUE"
 WOULD_OPTION_FALSE = "FALSE"
 
+# ``would_option_have_worked`` is a transparent stock-move proxy, not a
+# market-priced option outcome: TRUE means the underlying reached its target
+# within the horizon, FALSE means it did not. It says nothing about whether a
+# specific contract would have been profitable after premium, theta, and IV.
+WOULD_OPTION_BASIS_STOCK_TARGET_PROXY = "STOCK_TARGET_PROXY"
+WOULD_OPTION_PROXY_NOTE = (
+    "Proxy based on whether the stock reached its target — not market-priced "
+    "option P&L."
+)
+
 
 class RejectionOutcome(Base):
     __tablename__ = "rejection_outcomes"
@@ -93,7 +103,9 @@ class RejectionOutcome(Base):
 __all__ = [
     "SOURCE_DO_NOT_TOUCH",
     "SOURCE_REJECTION",
+    "WOULD_OPTION_BASIS_STOCK_TARGET_PROXY",
     "WOULD_OPTION_FALSE",
+    "WOULD_OPTION_PROXY_NOTE",
     "WOULD_OPTION_TRUE",
     "WOULD_OPTION_UNAVAILABLE",
     "RejectionOutcome",

@@ -74,4 +74,11 @@ if col_reset.button("Reset all to defaults"):
         st.success("Settings reset to defaults.")
 
 st.subheader("Effective settings")
-st.json(values)
+if values:
+    st.dataframe(
+        [{"Setting": key, "Value": str(value)} for key, value in sorted(values.items())],
+        use_container_width=True,
+        hide_index=True,
+    )
+else:
+    st.info("No stored setting overrides — defaults are in effect.")

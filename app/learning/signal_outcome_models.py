@@ -33,6 +33,18 @@ def utc_now() -> datetime:
 OPTION_OUTCOME_UNAVAILABLE = "OPTION_OUTCOME_UNAVAILABLE"
 OPTION_OUTCOME_ESTIMATED = "OPTION_OUTCOME_ESTIMATED"
 
+# How an ESTIMATED option outcome was derived. There is currently no
+# market-priced basis: the platform has no historical option-chain feed, so an
+# "estimated" return is a first-order delta approximation of the underlying's
+# move (it ignores theta decay, gamma, and IV change). A future market-priced
+# implementation should introduce ``OPTION_OUTCOME_BASIS_MARKET_PRICED`` and
+# populate ``option_return_pct`` from real contract prices instead.
+OPTION_OUTCOME_BASIS_DELTA_PROXY = "DELTA_APPROXIMATION_PROXY"
+OPTION_OUTCOME_PROXY_NOTE = (
+    "Estimated from the stock move via a first-order delta approximation — "
+    "not market-priced option P&L. Ignores theta decay, gamma, and IV change."
+)
+
 
 class SignalOutcome(Base):
     """Forward outcome of one recommendation at one horizon."""
@@ -91,7 +103,9 @@ class SignalOutcome(Base):
 
 
 __all__ = [
+    "OPTION_OUTCOME_BASIS_DELTA_PROXY",
     "OPTION_OUTCOME_ESTIMATED",
+    "OPTION_OUTCOME_PROXY_NOTE",
     "OPTION_OUTCOME_UNAVAILABLE",
     "SignalOutcome",
 ]

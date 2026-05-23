@@ -20,6 +20,7 @@ import streamlit as st  # noqa: E402
 
 from app.core.config import get_settings  # noqa: E402
 from app.dashboard.components.api_client import get_json, post_json  # noqa: E402
+from app.dashboard.components.ui_common import render_kv  # noqa: E402
 from app.ui_experience.risk_views import build_earnings_iv_view  # noqa: E402
 
 settings = get_settings()
@@ -63,12 +64,12 @@ view = build_earnings_iv_view(
 )
 
 st.subheader("Earnings")
-st.json(view["earnings"])
+render_kv(view["earnings"])
 
 st.subheader("Implied Volatility")
-if not view["iv"]["available"]:
-    st.warning(view["iv"]["detail"])
-st.json(view["iv"])
+if not view["iv"].get("available"):
+    st.warning(view["iv"].get("detail") or "IV data is not available.")
+render_kv(view["iv"], skip=("detail",))
 
 st.subheader("IV Crush Risk")
 crush = view["iv_crush_risk"]

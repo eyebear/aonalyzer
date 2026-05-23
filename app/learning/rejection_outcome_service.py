@@ -219,10 +219,13 @@ class RejectionOutcomeService:
     # ----------------------------------------------------------- classify
 
     def _would_option_have_worked(self, option_existed: bool, fr: Any) -> str:
+        """Stock-target PROXY, not market-priced option P&L.
+
+        TRUE/FALSE only reflects whether the underlying reached its target
+        within the horizon. See WOULD_OPTION_PROXY_NOTE in the models module.
+        """
         if not option_existed or not fr.available:
             return WOULD_OPTION_UNAVAILABLE
-        # Real option data existed: use the stock outcome as a transparent
-        # proxy (a long call works when the underlying reaches its target).
         if fr.target_hit:
             return WOULD_OPTION_TRUE
         return WOULD_OPTION_FALSE

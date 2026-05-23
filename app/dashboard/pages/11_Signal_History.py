@@ -22,6 +22,11 @@ st.caption(
     "Returns are computed only when enough price history exists; option "
     "outcomes are unavailable unless real manual option data existed."
 )
+st.warning(
+    "Option outcomes marked ESTIMATED are a delta-approximation **proxy** of "
+    "the stock move — not market-priced option P&L. They ignore theta decay, "
+    "gamma, and IV change."
+)
 
 if st.button("Run outcome tracking (after-close job)"):
     result = post_json("/api/outcomes/signals/run", {})

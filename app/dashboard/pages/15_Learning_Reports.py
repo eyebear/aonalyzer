@@ -23,25 +23,53 @@ st.caption(
     "automatically."
 )
 
+def _render_report_summary(summary: dict) -> None:
+    """Readable rendering of the weekly learning-report summary."""
+    signals = summary.get("signals") or {}
+    cols = st.columns(4)
+    cols[0].metric("Signals", signals.get("total", 0))
+    cols[1].metric("Evaluated", signals.get("evaluated", 0))
+    cols[2].metric("Target hit", signals.get("successes_target_hit", 0))
+    cols[3].metric("Stop hit", signals.get("failures_stop_hit", 0))
+
+    rejected = summary.get("rejected_outcomes") or {}
+    dnt = summary.get("do_not_touch_outcomes") or {}
+    overrides = summary.get("user_overrides") or {}
+    rows = [
+        {"Bucket": "Rejected candidates", "Total": rejected.get("total", 0),
+         "Correct": rejected.get("correct", 0), "Too strict": rejected.get("too_strict", 0)},
+        {"Bucket": "Do-Not-Touch freezes", "Total": dnt.get("total", 0),
+         "Correct": dnt.get("correct", 0), "Too strict": dnt.get("too_strict", 0)},
+        {"Bucket": "User overrides", "Total": overrides.get("total", 0),
+         "Correct": overrides.get("system_right", 0), "Too strict": overrides.get("user_right", 0)},
+    ]
+    st.dataframe(rows, use_container_width=True, hide_index=True)
+    note = (summary.get("manual_option_input_usage") or {}).get("note")
+    if note:
+        st.caption(note)
+    with st.expander("Full report payload", expanded=False):
+        st.json(summary)
+
+
 st.subheader("Weekly learning report")
 if st.button("Generate weekly report"):
     result = post_json("/api/learning/reports/generate", {})
     if result is not None:
         st.success("Report generated.")
-        st.json(result["result"]["summary"])
+        _render_report_summary((result.get("result") or {}).get("summary") or {})
 
 reports = get_json("/api/learning/reports")
 if reports is not None and reports.get("reports"):
     latest = reports["reports"][0]
-    st.write(f"Latest: {latest['period_start']} → {latest['period_end']}")
-    st.json(latest["summary"])
+    st.write(f"Latest: {latest.get('period_start', '—')} → {latest.get('period_end', '—')}")
+    _render_report_summary(latest.get("summary") or {})
 
 st.divider()
 st.subheader("Improvement suggestions (approval-gated)")
 if st.button("Generate improvement suggestions"):
     result = post_json("/api/learning/improvements/generate", {})
     if result is not None:
-        st.success(f"Suggestions: {result['result']}")
+        st.success(f"Suggestions: {result.get('result')}")
 
 suggestions = get_json("/api/learning/improvements", status="PROPOSED")
 if suggestions is not None and suggestions.get("suggestions"):
@@ -69,4 +97,4 @@ if st.button("Compare rule versions (shadow test)"):
         {"champion_min_risk_reward": champ_rr, "challenger_min_risk_reward": chall_rr},
     )
     if result is not None:
-        st.json(result["comparison"])
+        st.json(result.get("comparison") or result)

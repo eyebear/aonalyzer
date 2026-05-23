@@ -62,10 +62,10 @@ with col_gen:
     if st.button("Generate / refresh worklist"):
         result = post_json("/api/worklist/generate", {})
         if result is not None:
-            body = result["result"]
+            body = result.get("result") or {}
             st.success(
-                f"Created {body['items_created']}, refreshed "
-                f"{body['items_refreshed']}, removed {body['items_removed']}."
+                f"Created {body.get('items_created', 0)}, refreshed "
+                f"{body.get('items_refreshed', 0)}, removed {body.get('items_removed', 0)}."
             )
 
 worklist = get_json("/api/worklist", status="OPEN")
@@ -79,10 +79,10 @@ if worklist is not None:
         for item in sort_worklist_items(items):
             with st.container():
                 st.markdown(
-                    f"**{priority_badge(item['priority'])} · {item['symbol']}** "
-                    f"— {item['worklist_type']}"
+                    f"**{priority_badge(item.get('priority'))} · {item.get('symbol', '—')}** "
+                    f"— {item.get('worklist_type', '—')}"
                 )
-                st.write(item["summary"])
+                st.write(item.get("summary") or "")
                 if is_advanced(view_mode):
                     with st.expander("Details", expanded=False):
                         st.json(item)
@@ -94,9 +94,13 @@ st.divider()
 st.header("Agent Status")
 agent_status = get_json("/api/agent/status", timeout=5)
 if agent_status is not None:
-    st.json(agent_status) if is_advanced(view_mode) else st.write(
-        f"Scheduler running: {agent_status.get('scheduler_running', 'unknown')}"
-    )
+    cols = st.columns(3)
+    cols[0].metric("Status", str(agent_status.get("status", "unknown")))
+    cols[1].metric("Latest job", str(agent_status.get("latest_job_name") or "—"))
+    cols[2].metric("Latest result", str(agent_status.get("latest_job_status") or "—"))
+    if is_advanced(view_mode):
+        with st.expander("Raw agent status", expanded=False):
+            st.json(agent_status)
 runs = get_json("/api/agent/runs", timeout=5)
 if runs is not None and runs.get("runs"):
     st.dataframe(runs["runs"], use_container_width=True)
@@ -138,10 +142,10 @@ if dnt is not None:
         st.dataframe(
             [
                 {
-                    "Symbol": i["symbol"],
-                    "Category": i["freeze_category"],
-                    "Severity": i["freeze_severity"],
-                    "Expires": i["expires_at"] or "—",
+                    "Symbol": i.get("symbol"),
+                    "Category": i.get("freeze_category"),
+                    "Severity": i.get("freeze_severity"),
+                    "Expires": i.get("expires_at") or "—",
                 }
                 for i in frozen
             ],

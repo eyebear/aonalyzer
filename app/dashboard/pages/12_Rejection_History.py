@@ -21,6 +21,10 @@ st.caption(
     "Did past rejections and freezes turn out useful? Option outcomes are shown "
     "as unavailable unless real manual option data existed — never backfilled."
 )
+st.warning(
+    "`would_option_have_worked` is a **proxy** based on whether the stock "
+    "reached its target — not market-priced option P&L."
+)
 
 if st.button("Run rejection / freeze outcome tracking"):
     result = post_json("/api/outcomes/rejections/run", {})

@@ -8,9 +8,19 @@ from fastapi import APIRouter, Body, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.database.connection import get_db_session
-from app.learning.rejection_outcome_models import RejectionOutcome
+from app.learning.rejection_outcome_models import (
+    WOULD_OPTION_BASIS_STOCK_TARGET_PROXY,
+    WOULD_OPTION_PROXY_NOTE,
+    WOULD_OPTION_UNAVAILABLE,
+    RejectionOutcome,
+)
 from app.learning.rejection_outcome_service import RejectionOutcomeService
-from app.learning.signal_outcome_models import SignalOutcome
+from app.learning.signal_outcome_models import (
+    OPTION_OUTCOME_BASIS_DELTA_PROXY,
+    OPTION_OUTCOME_ESTIMATED,
+    OPTION_OUTCOME_PROXY_NOTE,
+    SignalOutcome,
+)
 from app.learning.signal_outcome_service import SignalOutcomeService
 
 router = APIRouter(prefix="/api/outcomes", tags=["outcomes"])
@@ -31,6 +41,18 @@ def _signal_to_dict(o: SignalOutcome) -> dict[str, Any]:
         "stop_hit": o.stop_hit,
         "option_outcome_status": o.option_outcome_status,
         "option_return_pct": o.option_return_pct,
+        # An ESTIMATED option return is a delta-approximation proxy of the
+        # stock move, never market-priced option P&L. Surface that explicitly.
+        "option_outcome_basis": (
+            OPTION_OUTCOME_BASIS_DELTA_PROXY
+            if o.option_outcome_status == OPTION_OUTCOME_ESTIMATED
+            else None
+        ),
+        "option_outcome_note": (
+            OPTION_OUTCOME_PROXY_NOTE
+            if o.option_outcome_status == OPTION_OUTCOME_ESTIMATED
+            else None
+        ),
         "evaluated_at": o.evaluated_at.isoformat() if o.evaluated_at else None,
     }
 
@@ -49,6 +71,16 @@ def _rejection_to_dict(o: RejectionOutcome) -> dict[str, Any]:
         "would_stock_target_hit": o.would_stock_target_hit,
         "option_data_available": o.option_data_available,
         "would_option_have_worked": o.would_option_have_worked,
+        "would_option_basis": (
+            WOULD_OPTION_BASIS_STOCK_TARGET_PROXY
+            if o.would_option_have_worked != WOULD_OPTION_UNAVAILABLE
+            else None
+        ),
+        "would_option_note": (
+            WOULD_OPTION_PROXY_NOTE
+            if o.would_option_have_worked != WOULD_OPTION_UNAVAILABLE
+            else None
+        ),
         "was_rejection_correct": o.was_rejection_correct,
         "is_too_strict": o.is_too_strict,
         "detail": o.detail,

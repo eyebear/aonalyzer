@@ -23,7 +23,7 @@ import streamlit as st  # noqa: E402
 
 from app.core.config import get_settings  # noqa: E402
 from app.dashboard.components.api_client import get_json, post_json  # noqa: E402
-from app.dashboard.components.ui_common import view_mode_selector  # noqa: E402
+from app.dashboard.components.ui_common import render_kv, view_mode_selector  # noqa: E402
 from app.ui_experience.view_mode import is_advanced  # noqa: E402
 
 settings = get_settings()
@@ -76,14 +76,18 @@ brief = get_json(
 )
 if brief is not None and brief.get("brief"):
     st.subheader("One-Page Brief")
-    for section in brief["brief"]["sections"]:
+    for section in brief["brief"].get("sections") or []:
         name = section.get("section", "").replace("_", " ").title()
         with st.expander(name, expanded=section.get("section") == "current_action"):
             if not section.get("available", True) and section.get("detail"):
                 st.info(section["detail"])
-            st.json(section) if is_advanced(view_mode) else st.write(
-                {k: v for k, v in section.items() if k not in ("section",)}
-            )
+            else:
+                render_kv(section, skip=("section", "available"))
+            # Expanders cannot be nested; show the raw payload inline in
+            # advanced mode only.
+            if is_advanced(view_mode):
+                st.caption("Raw section data (advanced)")
+                st.json(section, expanded=False)
 
 # --- Action panel (Phase 33.5) ---------------------------------------------
 
@@ -98,7 +102,10 @@ action = get_json(
 if action is not None and action.get("package"):
     pkg = action["package"]
     st.subheader("Action Suggestion")
-    st.write(f"**{pkg['final_action_label']}** — {pkg['suggested_action_summary']}")
+    st.write(
+        f"**{pkg.get('final_action_label', '—')}** — "
+        f"{pkg.get('suggested_action_summary', '')}"
+    )
 
 # --- Manual option input panel (Phase 33.6 - 33.12) ------------------------
 
@@ -115,10 +122,15 @@ if oc[0].button("Parse Option Text"):
     if raw_text.strip():
         result = post_json(f"/api/tickers/{symbol}/options/manual-input", {"raw_text": raw_text})
         if result is not None:
-            sid = result["snapshot"]["id"]
-            st.session_state["manual_snapshot_id"] = sid
-            st.success(f"Parsed and stored snapshot #{sid}.")
-            st.json(result["snapshot"])
+            snapshot = result.get("snapshot") or {}
+            sid = snapshot.get("id")
+            if sid is not None:
+                st.session_state["manual_snapshot_id"] = sid
+                st.success(f"Parsed and stored snapshot #{sid}.")
+            else:
+                st.warning("The parser did not return a stored snapshot.")
+            if snapshot:
+                st.json(snapshot, expanded=False)
     else:
         st.warning("Paste option text first.")
 
@@ -128,7 +140,7 @@ if oc[1].button("Analyze Option Text with AI"):
         analyzed = post_json(f"/api/options/manual-snapshots/{sid}/analyze")
         if analyzed is not None:
             st.success("AI explanation generated (no values invented).")
-            st.json(analyzed["snapshot"])
+            st.json(analyzed.get("snapshot") or analyzed, expanded=False)
     else:
         st.warning("Parse a contract first.")
 
@@ -138,9 +150,10 @@ if sid:
     suitability = post_json(f"/api/option-suitability/snapshots/{sid}/evaluate")
     if suitability is not None:
         st.subheader("Option Suitability")
-        st.json(suitability) if is_advanced(view_mode) else st.write(
-            suitability.get("candidate", suitability)
-        )
+        if is_advanced(view_mode):
+            st.json(suitability)
+        else:
+            st.write(suitability.get("candidate", suitability))
 
 # --- Earnings / IV risk (Phase 33.13) --------------------------------------
 
@@ -150,10 +163,28 @@ iv = get_json(f"/api/tickers/{symbol}/iv-risk")
 cols = st.columns(2)
 with cols[0]:
     st.caption("Earnings")
-    st.json(earnings.get("snapshot") if earnings else None)
+    snap = (earnings or {}).get("snapshot") or {}
+    if snap:
+        st.metric("Risk", str(snap.get("risk_label", "—")))
+        st.metric("Days to earnings", str(snap.get("days_to_earnings") or "—"))
+        if snap.get("risk_reason"):
+            st.caption(snap["risk_reason"])
+        if is_advanced(view_mode):
+            st.json(snap, expanded=False)
+    else:
+        st.info("No earnings risk snapshot available.")
 with cols[1]:
     st.caption("IV")
-    st.json(iv.get("snapshot") if iv else None)
+    snap = (iv or {}).get("snapshot") or {}
+    if snap:
+        st.metric("Risk", str(snap.get("risk_label", "—")))
+        st.metric("IV rank", str(snap.get("iv_rank") if snap.get("iv_rank") is not None else "—"))
+        if snap.get("risk_reason"):
+            st.caption(snap["risk_reason"])
+        if is_advanced(view_mode):
+            st.json(snap, expanded=False)
+    else:
+        st.info("No IV risk snapshot available.")
 
 # --- Memory / similar cases (Phase 33.16) ----------------------------------
 

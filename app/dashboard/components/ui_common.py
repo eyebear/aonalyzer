@@ -63,6 +63,25 @@ def render_progressive_record(
                 st.json(parts["advanced"])
 
 
+def render_kv(record: dict[str, Any], *, skip: tuple[str, ...] = ()) -> None:
+    """Render a flat-ish dict as readable ``**Label**: value`` lines.
+
+    ``None`` values and ``skip`` keys are omitted; nested dicts/lists are
+    rendered with Streamlit's native object renderer below their label.
+    """
+    import streamlit as st
+
+    for key, value in record.items():
+        if key in skip or value is None:
+            continue
+        label = str(key).replace("_", " ").capitalize()
+        if isinstance(value, dict | list):
+            st.write(f"**{label}**")
+            st.write(value)
+        else:
+            st.write(f"**{label}**: {value}")
+
+
 def manual_option_shortcut(
     symbol_default: str = "",
     *,
@@ -97,6 +116,7 @@ def manual_option_shortcut(
 
 __all__ = [
     "manual_option_shortcut",
+    "render_kv",
     "render_progressive_record",
     "view_mode_selector",
 ]
